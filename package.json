@@ -1,0 +1,28 @@
+{
+  "name": "iso19011-audit-tool",
+  "version": "1.0.0",
+  "description": "Interactive ISO 19011 Audit Management System with Research Tools and Templates",
+  "main": "index.html",
+  "scripts": {
+    "dev": "npx serve .",
+    "build": "echo 'Static site - no build required'",
+    "start": "npx serve ."
+  },
+  "keywords": [
+    "iso19011",
+    "audit",
+    "management",
+    "quality",
+    "research",
+    "templates",
+    "interactive"
+  ],
+  "author": "ISO 19011 Research Team",
+  "license": "MIT",
+  "devDependencies": {
+    "serve": "^14.2.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

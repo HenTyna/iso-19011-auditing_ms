@@ -1,0 +1,3298 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Interactive ISO 19011 Audit Management System with research tools, templates, and comprehensive flowcharts for audit professionals and researchers.">
+    <meta name="keywords" content="ISO 19011, audit management, quality management, audit tools, research templates, audit flowcharts">
+    <meta name="author" content="ISO 19011 Research Team">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://your-domain.vercel.app/">
+    <meta property="og:title" content="ISO 19011 Interactive Audit Management System">
+    <meta property="og:description" content="Comprehensive interactive tools and templates for ISO 19011 audit management and research.">
+    <meta property="og:image" content="https://your-domain.vercel.app/og-image.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://your-domain.vercel.app/">
+    <meta property="twitter:title" content="ISO 19011 Interactive Audit Management System">
+    <meta property="twitter:description" content="Comprehensive interactive tools and templates for ISO 19011 audit management and research.">
+    <meta property="twitter:image" content="https://your-domain.vercel.app/og-image.png">
+    
+    <title>ISO 19011 - Interactive Process Flowcharts</title>
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" as="script">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📋</text></svg>">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: #1e3c72;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 5px;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            color: #666;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .flowchart-container {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .flowchart-container.active {
+            display: block;
+        }
+
+        .flowchart {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .flow-step {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            min-width: 250px;
+            text-align: center;
+            border: 2px solid transparent;
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.3);
+        }
+
+        .flow-step:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(79, 70, 229, 0.4);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .flow-step.decision {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            border-radius: 50px;
+            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.3);
+        }
+
+        .flow-step.start {
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 50px;
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .flow-step.end {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            border-radius: 50px;
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.3);
+        }
+
+        .flow-step.process {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        }
+
+        .flow-step.document {
+            background: linear-gradient(135deg, #06b6d4, #0891b2);
+            transform: skew(-10deg);
+            box-shadow: 0 6px 20px rgba(6, 182, 212, 0.3);
+        }
+
+        .flow-step.document .step-content {
+            transform: skew(10deg);
+        }
+
+        .step-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .step-subtitle {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        .arrow {
+            width: 0;
+            height: 0;
+            border-left: 12px solid transparent;
+            border-right: 12px solid transparent;
+            border-top: 18px solid #6b7280;
+            animation: pulse 2s infinite;
+        }
+
+        .horizontal-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .right-arrow {
+            width: 0;
+            height: 0;
+            border-top: 12px solid transparent;
+            border-bottom: 12px solid transparent;
+            border-left: 18px solid #6b7280;
+            animation: pulse 2s infinite;
+        }
+
+        .parallel-container {
+            display: flex;
+            justify-content: space-around;
+            gap: 20px;
+            width: 100%;
+            flex-wrap: wrap;
+        }
+
+        .tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            margin-bottom: 10px;
+            z-index: 1000;
+        }
+
+        .tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: rgba(0, 0, 0, 0.9);
+        }
+
+        .flow-step:hover .tooltip {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 15px;
+            background: #f8f9fa;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        .phase-header {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin: 30px 0 20px 0;
+            box-shadow: 0 6px 20px rgba(30, 60, 114, 0.3);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 0.7;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .tabs {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .horizontal-flow {
+                flex-direction: column;
+            }
+
+            .right-arrow {
+                transform: rotate(90deg);
+            }
+        }
+
+        .detailed-info {
+            background: #f8f9fa;
+            border-left: 4px solid #4f46e5;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .info-title {
+            font-weight: 600;
+            color: #4f46e5;
+            margin-bottom: 10px;
+        }
+
+        .info-content {
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .research-tools {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .tool-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .tool-card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            border-left: 4px solid #4f46e5;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .tool-title {
+            font-weight: 600;
+            color: #4f46e5;
+            margin-bottom: 8px;
+        }
+
+        .tool-description {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+        }
+
+        .example-box {
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border: 1px solid #0ea5e9;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .example-title {
+            font-weight: 600;
+            color: #0c4a6e;
+            margin-bottom: 8px;
+        }
+
+        .example-content {
+            color: #0c4a6e;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>ISO 19011:2018 - Process Flowcharts</h1>
+            <p>Interactive visualization of audit management and execution processes</p>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" onclick="showFlowchart('audit-programme')">Audit Programme Management</div>
+            <div class="tab" onclick="showFlowchart('audit-process')">Individual Audit Process</div>
+            <div class="tab" onclick="showFlowchart('competence')">Auditor Competence</div>
+            <div class="tab" onclick="showFlowchart('principles')">Audit Principles</div>
+            <div class="tab" onclick="showFlowchart('research-methodology')">Research Methodology</div>
+            <div class="tab" onclick="showFlowchart('case-studies')">Case Studies & Examples</div>
+        </div>
+
+        <!-- Audit Programme Management Flow -->
+        <div id="audit-programme" class="flowchart-container active">
+            <div class="phase-header">ISO 19011 Clause 5: Managing an Audit Programme</div>
+
+            <div class="flowchart">
+                <div class="flow-step start" onclick="showDetails(this)">
+                    <div class="tooltip">Foundation of systematic audit approach</div>
+                    <div class="step-content">
+                        <div class="step-title">START</div>
+                        <div class="step-subtitle">Programme Initiation</div>
+                    </div>
+                </div>
+
+                <div class="arrow"></div>
+
+                <div class="flow-step process" onclick="showDetails(this)">
+                    <div class="tooltip">Define programme objectives, scope, and constraints</div>
+                    <div class="step-content">
+                        <div class="step-title">5.3 Establishing Programme</div>
+                        <div class="step-subtitle">Objectives • Scope • Criteria • Methods</div>
+                    </div>
+                </div>
+
+                <div class="arrow"></div>
+
+                <div class="horizontal-flow">
+                    <div class="flow-step document" onclick="showDetails(this)">
+                        <div class="tooltip">Resource planning and allocation</div>
+                        <div class="step-content">
+                            <div class="step-title">5.4.1 Resources</div>
+                            <div class="step-subtitle">Human • Financial • Technical</div>
+                        </div>
+                    </div>
+                    <div class="right-arrow"></div>
+                    <div class="flow-step process" onclick="showDetails(this)">
+                        <div class="tooltip">Schedule development and coordination</div>
+                        <div class="step-content">
+                            <div class="step-title">5.4.2 Scheduling</div>
+                            <div class="step-subtitle">Risk-based • Frequency • Timing</div>
+                        </div>
+                    </div>
+                    <div class="right-arrow"></div>
+                    <div class="flow-step process" onclick="showDetails(this)">
+                        <div class="tooltip">Team selection and assignment</div>
+                        <div class="step-content">
+                            <div class="step-title">5.4.3 Team Selection</div>
+                            <div class="step-subtitle">Competence • Independence • Size</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="arrow"></div>
+
+                <div class="flow-step process" onclick="showDetails(this)">
+                    <div class="tooltip">Execute planned audit activities</div>
+                    <div class="step-content">
+                        <div class="step-title">5.4 Implementation</div>
+                        <div class="step-subtitle">Conduct Audits • Manage Records • Communicate</div>
+                    </div>
+                </div>
+
+                <div class="arrow"></div>
+
+                <div class="parallel-container">
+                    <div class="flow-step process" onclick="showDetails(this)">
+                        <div class="tooltip">Track programme performance indicators</div>
+                        <div class="step-content">
+                            <div class="step-title">5.5.1 Monitoring</div>
+                            <div class="step-subtitle">KPIs • Progress • Issues</div>
+                        </div>
+                    </div>
+                    <div class="flow-step process" onclick="showDetails(this)">
+                        <div class="tooltip">Evaluate and improve programme</div>
+                        <div class="step-content">
+                            <div class="step-title">5.5.2 Review</div>
+                            <div class="step-subtitle">Effectiveness • Objectives • Improvement</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="arrow"></div>
+
+                <div class="flow-step decision" onclick="showDetails(this)">
+                    <div class="tooltip">Decision point for programme continuation</div>
+                    <div class="step-content">
+                        <div class="step-title">Programme Effective?</div>
+                        <div class="step-subtitle">Goals Met • Stakeholder Satisfaction</div>
+                    </div>
+                </div>
+
+                <div class="arrow"></div>
+
+                <div class="flow-step end" onclick="showDetails(this)">
+                    <div class="tooltip">Continuous improvement cycle</div>
+                    <div class="step-content">
+                        <div class="step-title">CONTINUOUS IMPROVEMENT</div>
+                        <div class="step-subtitle">Update • Enhance • Evolve</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detailed-info">
+                <div class="info-title">Key Success Factors for Programme Management:</div>
+                <div class="info-content">
+                    • Leadership commitment and resource allocation<br>
+                    • Clear communication of objectives and expectations<br>
+                    • Risk-based approach to audit scheduling<br>
+                    • Competent and independent audit teams<br>
+                    • Systematic monitoring and continuous improvement
+                </div>
+            </div>
+
+            <div class="example-box">
+                <div class="example-title">📋 Practical Example: Manufacturing Company Audit Programme</div>
+                <div class="example-content">
+                    <strong>Company:</strong> AutoParts Manufacturing Ltd. (500 employees, 3 sites)<br>
+                    <strong>Programme Objective:</strong> Ensure QMS compliance and drive continuous improvement<br>
+                    <strong>Annual Schedule:</strong><br>
+                    • Q1: Internal QMS audits (all sites)<br>
+                    • Q2: Supplier audits (critical suppliers)<br>
+                    • Q3: Process audits (key manufacturing processes)<br>
+                    • Q4: Management review and programme evaluation<br>
+                    <strong>Resources:</strong> 2 lead auditors, 4 team auditors, $50K budget<br>
+                    <strong>Success Metrics:</strong> 95% corrective action closure rate, 15% process improvement
+                </div>
+            </div>
+
+            <div class="research-tools">
+                <div class="info-title">🔧 Research Tools & Templates</div>
+                <div class="tool-grid">
+                    <div class="tool-card">
+                        <div class="tool-title">Audit Programme Planning Template</div>
+                        <div class="tool-description">Comprehensive template for developing annual audit programmes
+                            including objectives, scope, resources, and scheduling.</div>
+                        <button class="download-btn" onclick="downloadTemplate('audit-programme-template')">Download
+                            Template</button>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-title">Risk Assessment Matrix</div>
+                        <div class="tool-description">Tool for evaluating audit risks and determining appropriate audit
+                            frequency and scope.</div>
+                        <button class="download-btn" onclick="downloadTemplate('risk-assessment-matrix')">Download
+                            Tool</button>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-title">Programme Performance Dashboard</div>
+                        <div class="tool-description">Excel-based dashboard for tracking audit programme KPIs and
+                            performance metrics.</div>
+                        <button class="download-btn" onclick="downloadTemplate('performance-dashboard')">Download
+                            Dashboard</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Individual Audit Process Flow -->
+        <div id="audit-process" class="flowchart-container">
+            <div class="phase-header">ISO 19011 Clause 6: Conducting an Audit</div>
+
+            <div class="flowchart">
+                <div class="flow-step start" onclick="showDetails(this)">
+                    <div class="tooltip">Begin individual audit activity</div>
+                    <div class="step-content">
+                        <div class="step-title">6.2 Initiating Audit</div>
+                        <div class="step-subtitle">Contact • Feasibility • Objectives</div>
+                    </div>
+                </div>
+
+                <div class="arrow"></div>
+
+                <div class="horizontal-flow">
+                    <div class="flow-step document" onclick="showDetails(this)">
+                        <div class="tooltip">Document and information review</div>
+                        <div class="step-content">
+                            <div class="step-title">6.3.1 Document Review</div>
+                            <div class="step-subtitle">Procedures • Records • Previous Audits</div>
+                        </div>
+                    </div>
+                    <div class="right-arrow"></div>
+                    <div class="flow-step process" onclick="showDetails(this)">
+                        <div class="tooltip">Detailed audit planning</div>
+                        <div class="step-content">
+                            <div class="step-title">6.3.2 Audit Plan</div>
+                            <div class="step-subtitle">Schedule • Methods • Resources</div>
+                        </div>
+                    </div>
+                    <div class="right-arrow"></div>
+                    <div class="flow-step process" onclick="showDetails(this)">
+                        <div class="tooltip">Team role assignments</div>
+                        <div class="step-content">
+                            <div class="step-title">6.3.3 Team Assignments</div>
+                            <div class="step-subtitle">Lead • Auditor • Expert Roles</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="arrow"></div>
+
+                <div class="flow-step process" onclick="showDetails(this)">
+                    <div class="tooltip">Formal audit commencement</div>
+                    <div class="step-content">
+                        <div class="step-title">6.4.1 Opening Meeting</div>
+                        <div class="step-subtitle">Introductions • Scope • Methods • Schedule</div>
+                    </div>
+                </div>
+
+                <div class="arrow"></div>
+
+                <div class="phase-header">Evidence Collection Phase</div>
+
+                <div class="parallel-container">
+                    <div class="flow-step process" onclick="showDetails(this)">
+                        <div class="tooltip">Systematic questioning and discussion</div>
+                        <div class="step-content">
+                            <div class="step-title">6.4.3 Interviews</div>
+                            <div class="step-subtitle">Personnel • Management • Operators</div>
+                        </div>
+                    </div>
+                    <div class="flow-step process" onclick="showDetails(this)">
+                        <div class="tooltip">Direct observation of activities</div>
+                        <div class="step-content">
+                            <div class="step-title">6.4.4 Observation</div>
+                            <div class="step-subtitle">Processes • Conditions • Practices</div>
+                        </div>
+                    </div>
+                    <div class="flow-step document" onclick="showDetails(this)">
+                        <div class="tooltip">Document and record examination</div>
+                        <div class="step-content">
+                            <div class="step-title">6.4.5 Document Review</div>
+                            <div class="step-subtitle">Records • Reports • Data</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="arrow"></div>
+
+                <div class="flow-step process" onclick="showDetails(this)">
+                    <div class="tooltip">Analysis and evaluation of collected evidence</div>
+                    <div class="step-content">
+                        <div class="step-title">6.4.6 Evidence Evaluation</div>
+                        <div class="step-subtitle">Analysis • Verification • Classification</div>
+                    </div>
+                </div>
+
+                <div class="arrow"></div>
+
+                <div class="flow-step decision" onclick="showDetails(this)">
+                    <div class="tooltip">Assessment of evidence sufficiency</div>
+                    <div class="step-content">
+                        <div class="step-title">Sufficient Evidence?</div>
+                        <div class="step-subtitle">Adequate • Appropriate • Reliable</div>
+                    </div>
+                </div>
+
+                <div class="arrow"></div>
+
+                <div class="flow-step process" onclick="showDetails(this)">
+                    <div class="tooltip">Present findings to auditee</div>
+                    <div class="step-content">
+                        <div class="step-title">6.4.9 Closing Meeting</div>
+                        <div class="step-subtitle">Findings • Conclusions • Next Steps</div>
+                    </div>
+                </div>
+
+                <div class="arrow"></div>
+
+                <div class="flow-step document" onclick="showDetails(this)">
+                    <div class="tooltip">Formal documentation of audit results</div>
+                    <div class="step-content">
+                        <div class="step-title">6.5 Audit Report</div>
+                        <div class="step-subtitle">Findings • Evidence • Recommendations</div>
+                    </div>
+                </div>
+
+                <div class="arrow"></div>
+
+                <div class="flow-step process" onclick="showDetails(this)">
+                    <div class="tooltip">Verify corrective action implementation</div>
+                    <div class="step-content">
+                        <div class="step-title">6.6 Follow-up</div>
+                        <div class="step-subtitle">Corrective Actions • Verification • Closure</div>
+                    </div>
+                </div>
+
+                <div class="arrow"></div>
+
+                <div class="flow-step end" onclick="showDetails(this)">
+                    <div class="tooltip">Audit cycle completion</div>
+                    <div class="step-content">
+                        <div class="step-title">AUDIT COMPLETE</div>
+                        <div class="step-subtitle">Archive • Lessons Learned</div>
+                    </div>
+                </div>
+            </div>
+            <div class="example-box">
+                <div class="example-title">🔍 Practical Example: Healthcare Provider Audit Process</div>
+                <div class="example-content">
+                    <strong>Organization:</strong> Regional Medical Center (2000 employees, 5 departments)<br>
+                    <strong>Audit Scope:</strong> Integrated QMS/EMS audit focusing on patient safety and environmental
+                    compliance<br>
+                    <strong>Audit Team:</strong> Lead auditor + 2 team auditors + 1 technical expert (environmental)<br>
+                    <strong>Key Findings:</strong><br>
+                    • 3 major nonconformities (patient safety procedures)<br>
+                    • 8 minor nonconformities (documentation gaps)<br>
+                    • 12 opportunities for improvement<br>
+                    <strong>Follow-up:</strong> 100% corrective action implementation within 90 days
+                </div>
+            </div>
+
+            <div class="research-tools">
+                <div class="info-title">🔧 Audit Process Tools</div>
+                <div class="tool-grid">
+                    <div class="tool-card">
+                        <div class="tool-title">Audit Planning Checklist</div>
+                        <div class="tool-description">Comprehensive checklist covering all aspects of audit planning
+                            from initiation to closing meeting.</div>
+                        <button class="download-btn" onclick="downloadTemplate('audit-planning-checklist')">Download
+                            Checklist</button>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-title">Evidence Collection Forms</div>
+                        <div class="tool-description">Standardized forms for documenting audit evidence, observations,
+                            and findings.</div>
+                        <button class="download-btn" onclick="downloadTemplate('evidence-collection-forms')">Download
+                            Forms</button>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-title">Audit Report Template</div>
+                        <div class="tool-description">Professional audit report template with sections for findings,
+                            conclusions, and recommendations.</div>
+                        <button class="download-btn" onclick="downloadTemplate('audit-report-template')">Download
+                            Template</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Auditor Competence Flow -->
+        <div id="competence" class="flowchart-container">
+            <div class="phase-header">ISO 19011 Clause 7: Competence and Evaluation of Auditors</div>
+
+            <div class="flowchart">
+                <div class="flow-step start" onclick="showDetails(this)">
+                    <div class="tooltip">Begin competence development journey</div>
+                    <div class="step-content">
+                        <div class="step-title">7.1 General</div>
+                        <div class="step-subtitle">Competence Framework Definition</div>
+                    </div>
+                </div>
+
+                <div class="arrow"></div>
+
+                <div class="parallel-container">
+                    <div class="flow-step process" onclick="showDetails(this)">
+                        <div class="tooltip">Essential knowledge areas</div>
+                        <div class="step-content">
+                            <div class="step-title">7.2.2 Knowledge</div>
+                            <div class="step-subtitle">Standards • Processes • Methods</div>
+                        </div>
+                    </div>
+                    <div class="flow-step process" onclick="showDetails(this)">
+                        <div class="tooltip">Practical abilities and capabilities</div>
+                        <div class="step-content">
+                            <div class="step-title">7.2.3 Skills</div>
+                            <div class="step-subtitle">Communication • Analysis • Leadership</div>
+                        </div>
+                    </div>
+                    <div class="flow-step process" onclick="showDetails(this)">
+                        <div class="tooltip">Personal characteristics and behavior</div>
+                        <div class="step-content">
+                            <div class="step-title">7.2.4 Personal Attributes</div>
+                            <div class="step-subtitle">Ethical • Diplomatic • Perceptive</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="arrow"></div>
+
+                <div class="flow-step process" onclick="showDetails(this)">
+                    <div class="tooltip">Domain-specific expertise requirements</div>
+                    <div class="step-content">
+                        <div class="step-title">7.3 Discipline-Specific</div>
+                        <div class="step-subtitle">QMS • EMS • ISMS • OHSMS</div>
+                    </div>
+                </div>
+
+                <div class="arrow"></div>
+
+                <div class="phase-header">Competence Evaluation Process</div>
+
+                <div class="horizontal-flow">
+                    <div class="flow-step document" onclick="showDetails(this)">
+                        <div class="tooltip">Initial assessment methods</div>
+                        <div class="step-content">
+                            <div class="step-title">7.4 Initial Evaluation</div>
+                            <div class="step-subtitle">Education • Experience • Training</div>
+                        </div>
+                    </div>
+                    <div class="right-arrow"></div>
+                    <div class="flow-step process" onclick="showDetails(this)">
+                        <div class="tooltip">Practical competence demonstration</div>
+                        <div class="step-content">
+                            <div class="step-title">7.5 Ongoing Evaluation</div>
+                            <div class="step-subtitle">Performance • Feedback • Development</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="arrow"></div>
+
+                <div class="flow-step decision" onclick="showDetails(this)">
+                    <div class="tooltip">Competence adequacy assessment</div>
+                    <div class="step-content">
+                        <div class="step-title">Competent for Role?</div>
+                        <div class="step-subtitle">Knowledge • Skills • Attributes</div>
+                    </div>
+                </div>
+
+                <div class="horizontal-flow">
+                    <div class="flow-step process" onclick="showDetails(this)">
+                        <div class="tooltip">Additional development required</div>
+                        <div class="step-content">
+                            <div class="step-title">Development Plan</div>
+                            <div class="step-subtitle">Training • Coaching • Experience</div>
+                        </div>
+                    </div>
+                    <div class="right-arrow"></div>
+                    <div class="flow-step process" onclick="showDetails(this)">
+                        <div class="tooltip">Qualified for audit assignments</div>
+                        <div class="step-content">
+                            <div class="step-title">Assignment Ready</div>
+                            <div class="step-subtitle">Lead Auditor • Team Member</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="arrow"></div>
+
+                <div class="flow-step end" onclick="showDetails(this)">
+                    <div class="tooltip">Continuous professional development</div>
+                    <div class="step-content">
+                        <div class="step-title">CPD & Maintenance</div>
+                        <div class="step-subtitle">Updates • Enhancement • Growth</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="example-box">
+                <div class="example-title">👨‍💼 Practical Example: Auditor Competence Development Program</div>
+                <div class="example-content">
+                    <strong>Organization:</strong> Global Certification Body (200 auditors worldwide)<br>
+                    <strong>Competence Framework:</strong> Multi-level approach (Trainee → Auditor → Lead Auditor →
+                    Technical Expert)<br>
+                    <strong>Development Path:</strong><br>
+                    • <strong>Knowledge:</strong> ISO standards training, industry-specific courses<br>
+                    • <strong>Skills:</strong> Communication workshops, conflict resolution, technical writing<br>
+                    • <strong>Experience:</strong> Mentored audits, shadowing, progressive responsibility<br>
+                    <strong>Evaluation Methods:</strong> Written exams, practical assessments, peer reviews, client
+                    feedback<br>
+                    <strong>Success Rate:</strong> 85% of trainees achieve lead auditor status within 2 years
+                </div>
+            </div>
+
+            <div class="research-tools">
+                <div class="info-title">🔧 Competence Development Tools</div>
+                <div class="tool-grid">
+                    <div class="tool-card">
+                        <div class="tool-title">Competence Assessment Matrix</div>
+                        <div class="tool-description">Comprehensive tool for evaluating auditor knowledge, skills, and
+                            personal attributes.</div>
+                        <button class="download-btn" onclick="downloadTemplate('competence-assessment-matrix')">Download
+                            Matrix</button>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-title">Training Needs Analysis Template</div>
+                        <div class="tool-description">Template for identifying training gaps and developing personalized
+                            development plans.</div>
+                        <button class="download-btn" onclick="downloadTemplate('training-needs-analysis')">Download
+                            Template</button>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-title">Performance Evaluation Forms</div>
+                        <div class="tool-description">Standardized forms for evaluating auditor performance during live
+                            audits.</div>
+                        <button class="download-btn" onclick="downloadTemplate('performance-evaluation-forms')">Download
+                            Forms</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Audit Principles Flow -->
+        <div id="principles" class="flowchart-container">
+            <div class="phase-header">ISO 19011 Clause 4: Principles of Auditing</div>
+
+            <div class="flowchart">
+                <div class="flow-step start" onclick="showDetails(this)">
+                    <div class="tooltip">Foundation of professional auditing</div>
+                    <div class="step-content">
+                        <div class="step-title">Seven Principles</div>
+                        <div class="step-subtitle">Ethical Foundation for Auditing</div>
+                    </div>
+                </div>
+
+                <div class="arrow"></div>
+
+                <div class="parallel-container">
+                    <div class="flow-step process" onclick="showDetails(this)">
+                        <div class="tooltip">Honest and responsible conduct</div>
+                        <div class="step-content">
+                            <div class="step-title">Integrity</div>
+                            <div class="step-subtitle">Ethical • Honest • Responsible</div>
+                        </div>
+                    </div>
+                    <div class="flow-step process" onclick="showDetails(this)">
+                        <div class="tooltip">Truthful and accurate reporting</div>
+                        <div class="step-content">
+                            <div class="step-title">Fair Presentation</div>
+                            <div class="step-subtitle">Truthful • Accurate • Complete</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="arrow"></div>
+
+                <div class="parallel-container">
+                    <div class="flow-step process" onclick="showDetails(this)">
+                        <div class="tooltip">Professional diligence and judgment</div>
+                        <div class="step-content">
+                            <div class="step-title">Due Professional Care</div>
+                            <div class="step-subtitle">Diligent • Skilled • Careful</div>
+                        </div>
+                    </div>
+                    <div class="flow-step process" onclick="showDetails(this)">
+                        <div class="tooltip">Information security and discretion</div>
+                        <div class="step-content">
+                            <div class="step-title">Confidentiality</div>
+                            <div class="step-subtitle">Secure • Discreet • Protected</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="arrow"></div>
+
+                <div class="parallel-container">
+                    <div class="flow-step process" onclick="showDetails(this)">
+                        <div class="tooltip">Objectivity and impartiality</div>
+                        <div class="step-content">
+                            <div class="step-title">Independence</div>
+                            <div class="step-subtitle">Objective • Impartial • Unbiased</div>
+                        </div>
+                    </div>
+                    <div class="flow-step process" onclick="showDetails(this)">
+                        <div class="tooltip">Systematic and verifiable approach</div>
+                        <div class="step-content">
+                            <div class="step-title">Evidence-Based</div>
+                            <div class="step-subtitle">Verifiable • Systematic • Reliable</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="arrow"></div>
+
+                <div class="flow-step process" onclick="showDetails(this)">
+                    <div class="tooltip">Risk-focused audit approach</div>
+                    <div class="step-content">
+                        <div class="step-title">Risk-Based Approach</div>
+                        <div class="step-subtitle">Context • Risk • Opportunity</div>
+                    </div>
+                </div>
+
+                <div class="arrow"></div>
+
+                <div class="flow-step end" onclick="showDetails(this)">
+                    <div class="tooltip">Integrated application in practice</div>
+                    <div class="step-content">
+                        <div class="step-title">PRINCIPLES INTEGRATION</div>
+                        <div class="step-subtitle">Consistent Professional Practice</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detailed-info">
+                <div class="info-title">Principle Interdependencies:</div>
+                <div class="info-content">
+                    The seven principles work together synergistically. Independence supports fair presentation,
+                    integrity enables confidentiality, and evidence-based approach is enhanced by risk-based thinking.
+                    All principles must be consistently applied throughout the audit process.
+                </div>
+            </div>
+
+            <div class="example-box">
+                <div class="example-title">⚖️ Practical Example: Principles in Action - Financial Services Audit</div>
+                <div class="example-content">
+                    <strong>Scenario:</strong> Internal audit of a bank's loan processing system<br>
+                    <strong>Principle Application:</strong><br>
+                    • <strong>Integrity:</strong> Auditor discloses personal relationship with loan manager<br>
+                    • <strong>Fair Presentation:</strong> Balanced reporting of both strengths and weaknesses<br>
+                    • <strong>Due Professional Care:</strong> Thorough review of 500+ loan files over 3 weeks<br>
+                    • <strong>Confidentiality:</strong> Secure handling of customer financial data<br>
+                    • <strong>Independence:</strong> Auditor not involved in loan approval process<br>
+                    • <strong>Evidence-Based:</strong> Systematic sampling and documentation<br>
+                    • <strong>Risk-Based:</strong> Focus on high-risk loan categories<br>
+                    <strong>Outcome:</strong> Improved loan approval process, reduced default rates by 15%
+                </div>
+            </div>
+
+            <div class="research-tools">
+                <div class="info-title">🔧 Principles Assessment Tools</div>
+                <div class="tool-grid">
+                    <div class="tool-card">
+                        <div class="tool-title">Principles Self-Assessment Tool</div>
+                        <div class="tool-description">Self-evaluation tool for auditors to assess their adherence to the
+                            seven principles.</div>
+                        <button class="download-btn" onclick="downloadTemplate('principles-self-assessment')">Download
+                            Tool</button>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-title">Ethical Decision Framework</div>
+                        <div class="tool-description">Framework for making ethical decisions during challenging audit
+                            situations.</div>
+                        <button class="download-btn" onclick="downloadTemplate('ethical-decision-framework')">Download
+                            Framework</button>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-title">Principles Training Module</div>
+                        <div class="tool-description">Interactive training module covering the seven principles with
+                            case studies.</div>
+                        <button class="download-btn" onclick="downloadTemplate('principles-training-module')">Download
+                            Module</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Research Methodology Flow -->
+        <div id="research-methodology" class="flowchart-container">
+            <div class="phase-header">ISO 19011 Research Methodology Framework</div>
+
+            <div class="flowchart">
+                <div class="flow-step start" onclick="showDetails(this)">
+                    <div class="tooltip">Research foundation and objectives</div>
+                    <div class="step-content">
+                        <div class="step-title">Research Initiation</div>
+                        <div class="step-subtitle">Problem Definition • Objectives • Scope</div>
+                    </div>
+                </div>
+
+                <div class="arrow"></div>
+
+                <div class="horizontal-flow">
+                    <div class="flow-step document" onclick="showDetails(this)">
+                        <div class="tooltip">Literature review and gap analysis</div>
+                        <div class="step-content">
+                            <div class="step-title">Literature Review</div>
+                            <div class="step-subtitle">Standards • Publications • Best Practices</div>
+                        </div>
+                    </div>
+                    <div class="right-arrow"></div>
+                    <div class="flow-step process" onclick="showDetails(this)">
+                        <div class="tooltip">Research design and methodology</div>
+                        <div class="step-content">
+                            <div class="step-title">Methodology Design</div>
+                            <div class="step-subtitle">Quantitative • Qualitative • Mixed Methods</div>
+                        </div>
+                    </div>
+                    <div class="right-arrow"></div>
+                    <div class="flow-step process" onclick="showDetails(this)">
+                        <div class="tooltip">Data collection planning</div>
+                        <div class="step-content">
+                            <div class="step-title">Data Collection Plan</div>
+                            <div class="step-subtitle">Surveys • Interviews • Observations</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="arrow"></div>
+
+                <div class="parallel-container">
+                    <div class="flow-step process" onclick="showDetails(this)">
+                        <div class="tooltip">Primary data collection methods</div>
+                        <div class="step-content">
+                            <div class="step-title">Primary Research</div>
+                            <div class="step-subtitle">Audit Observations • Expert Interviews</div>
+                        </div>
+                    </div>
+                    <div class="flow-step process" onclick="showDetails(this)">
+                        <div class="tooltip">Secondary data analysis</div>
+                        <div class="step-content">
+                            <div class="step-title">Secondary Research</div>
+                            <div class="step-subtitle">Reports • Statistics • Case Studies</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="arrow"></div>
+
+                <div class="flow-step process" onclick="showDetails(this)">
+                    <div class="tooltip">Data analysis and interpretation</div>
+                    <div class="step-content">
+                        <div class="step-title">Data Analysis</div>
+                        <div class="step-subtitle">Statistical • Qualitative • Comparative</div>
+                    </div>
+                </div>
+
+                <div class="arrow"></div>
+
+                <div class="flow-step decision" onclick="showDetails(this)">
+                    <div class="tooltip">Research validity assessment</div>
+                    <div class="step-content">
+                        <div class="step-title">Findings Valid?</div>
+                        <div class="step-subtitle">Reliability • Validity • Generalizability</div>
+                    </div>
+                </div>
+
+                <div class="arrow"></div>
+
+                <div class="flow-step document" onclick="showDetails(this)">
+                    <div class="tooltip">Research documentation and reporting</div>
+                    <div class="step-content">
+                        <div class="step-title">Research Report</div>
+                        <div class="step-subtitle">Findings • Conclusions • Recommendations</div>
+                    </div>
+                </div>
+
+                <div class="arrow"></div>
+
+                <div class="flow-step end" onclick="showDetails(this)">
+                    <div class="tooltip">Knowledge dissemination and application</div>
+                    <div class="step-content">
+                        <div class="step-title">Knowledge Transfer</div>
+                        <div class="step-subtitle">Publication • Training • Implementation</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detailed-info">
+                <div class="info-title">Research Methodology Best Practices:</div>
+                <div class="info-content">
+                    • <strong>Mixed Methods Approach:</strong> Combine quantitative surveys with qualitative interviews
+                    for comprehensive insights<br>
+                    • <strong>Triangulation:</strong> Use multiple data sources to validate findings<br>
+                    • <strong>Longitudinal Studies:</strong> Track audit effectiveness over time<br>
+                    • <strong>Case Study Analysis:</strong> Deep dive into specific audit scenarios<br>
+                    • <strong>Expert Panel Reviews:</strong> Validate research findings with industry experts
+                </div>
+            </div>
+
+            <div class="example-box">
+                <div class="example-title">📊 Research Example: Audit Effectiveness Study</div>
+                <div class="example-content">
+                    <strong>Research Question:</strong> How do different audit methodologies impact organizational
+                    performance?<br>
+                    <strong>Methodology:</strong> Mixed-methods longitudinal study<br>
+                    <strong>Sample:</strong> 50 organizations across 5 industries<br>
+                    <strong>Data Collection:</strong><br>
+                    • Quantitative: Performance metrics, audit scores, compliance rates<br>
+                    • Qualitative: Semi-structured interviews, focus groups, document analysis<br>
+                    <strong>Duration:</strong> 3-year study with quarterly data collection<br>
+                    <strong>Key Findings:</strong> Risk-based audits showed 25% better performance improvement than
+                    traditional approaches
+                </div>
+            </div>
+
+            <div class="research-tools">
+                <div class="info-title">🔬 Research Tools & Methodologies</div>
+                <div class="tool-grid">
+                    <div class="tool-card">
+                        <div class="tool-title">Research Design Template</div>
+                        <div class="tool-description">Comprehensive template for designing ISO 19011 research studies
+                            including methodology, sampling, and analysis plans.</div>
+                        <button class="download-btn" onclick="downloadTemplate('research-design-template')">Download
+                            Template</button>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-title">Data Collection Instruments</div>
+                        <div class="tool-description">Standardized surveys, interview guides, and observation forms for
+                            audit research.</div>
+                        <button class="download-btn" onclick="downloadTemplate('data-collection-instruments')">Download
+                            Instruments</button>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-title">Statistical Analysis Guide</div>
+                        <div class="tool-description">Guide for analyzing audit research data using statistical methods
+                            and software.</div>
+                        <button class="download-btn" onclick="downloadTemplate('statistical-analysis-guide')">Download
+                            Guide</button>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-title">Literature Review Framework</div>
+                        <div class="tool-description">Framework for conducting systematic literature reviews in audit
+                            management research.</div>
+                        <button class="download-btn" onclick="downloadTemplate('literature-review-framework')">Download
+                            Framework</button>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-title">Research Ethics Checklist</div>
+                        <div class="tool-description">Checklist for ensuring research ethics compliance in audit
+                            studies.</div>
+                        <button class="download-btn" onclick="downloadTemplate('research-ethics-checklist')">Download
+                            Checklist</button>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-title">Dissemination Strategy Template</div>
+                        <div class="tool-description">Template for planning research dissemination through publications,
+                            conferences, and industry forums.</div>
+                        <button class="download-btn"
+                            onclick="downloadTemplate('dissemination-strategy-template')">Download Template</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Case Studies & Examples Flow -->
+        <div id="case-studies" class="flowchart-container">
+            <div class="phase-header">ISO 19011 Case Studies & Practical Examples</div>
+
+            <div class="flowchart">
+                <div class="flow-step start" onclick="showDetails(this)">
+                    <div class="tooltip">Real-world audit scenarios</div>
+                    <div class="step-content">
+                        <div class="step-title">Case Study Categories</div>
+                        <div class="step-subtitle">Industry • Size • Complexity • Sector</div>
+                    </div>
+                </div>
+
+                <div class="arrow"></div>
+
+                <div class="parallel-container">
+                    <div class="flow-step process" onclick="showDetails(this)">
+                        <div class="tooltip">Manufacturing sector examples</div>
+                        <div class="step-content">
+                            <div class="step-title">Manufacturing</div>
+                            <div class="step-subtitle">Automotive • Electronics • Pharmaceuticals</div>
+                        </div>
+                    </div>
+                    <div class="flow-step process" onclick="showDetails(this)">
+                        <div class="tooltip">Service sector examples</div>
+                        <div class="step-content">
+                            <div class="step-title">Services</div>
+                            <div class="step-subtitle">Healthcare • Finance • IT • Education</div>
+                        </div>
+                    </div>
+                    <div class="flow-step process" onclick="showDetails(this)">
+                        <div class="tooltip">Public sector examples</div>
+                        <div class="step-content">
+                            <div class="step-title">Public Sector</div>
+                            <div class="step-subtitle">Government • NGOs • Utilities</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="arrow"></div>
+
+                <div class="horizontal-flow">
+                    <div class="flow-step document" onclick="showDetails(this)">
+                        <div class="tooltip">Small organization challenges</div>
+                        <div class="step-content">
+                            <div class="step-title">SME Challenges</div>
+                            <div class="step-subtitle">Resource Constraints • Simplified Approaches</div>
+                        </div>
+                    </div>
+                    <div class="right-arrow"></div>
+                    <div class="flow-step document" onclick="showDetails(this)">
+                        <div class="tooltip">Large organization complexity</div>
+                        <div class="step-content">
+                            <div class="step-title">Large Organization</div>
+                            <div class="step-subtitle">Multi-site • Complex Processes • Stakeholders</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="arrow"></div>
+
+                <div class="flow-step process" onclick="showDetails(this)">
+                    <div class="tooltip">Lessons learned and best practices</div>
+                    <div class="step-content">
+                        <div class="step-title">Lessons Learned</div>
+                        <div class="step-subtitle">Success Factors • Common Pitfalls • Improvements</div>
+                    </div>
+                </div>
+
+                <div class="arrow"></div>
+
+                <div class="flow-step end" onclick="showDetails(this)">
+                    <div class="tooltip">Knowledge application and transfer</div>
+                    <div class="step-content">
+                        <div class="step-title">Knowledge Application</div>
+                        <div class="step-subtitle">Best Practices • Templates • Guidelines</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detailed-info">
+                <div class="info-title">Case Study Examples:</div>
+                <div class="info-content">
+                    • <strong>Automotive Manufacturing:</strong> Multi-site QMS audit with 15 locations across 3
+                    countries<br>
+                    • <strong>Healthcare Provider:</strong> Integrated management system audit (QMS + EMS + OHSMS)<br>
+                    • <strong>Financial Services:</strong> Risk-based audit approach for regulatory compliance<br>
+                    • <strong>IT Services:</strong> Remote audit methodologies during COVID-19 pandemic<br>
+                    • <strong>Small Manufacturing:</strong> Simplified audit approach for 50-employee company
+                </div>
+            </div>
+
+            <div class="example-box">
+                <div class="example-title">🏭 Detailed Case Study: Global Automotive Supplier</div>
+                <div class="example-content">
+                    <strong>Company:</strong> AutoTech Global (5,000 employees, 15 sites, 3 countries)<br>
+                    <strong>Challenge:</strong> Standardize audit approach across diverse locations while maintaining
+                    local compliance<br>
+                    <strong>Solution:</strong> Developed integrated audit programme with centralized coordination and
+                    local execution<br>
+                    <strong>Implementation:</strong><br>
+                    • Central audit team: 3 lead auditors, 2 technical experts<br>
+                    • Local audit teams: 1 lead auditor per site<br>
+                    • Standardized procedures with local customization options<br>
+                    • Digital audit platform for real-time reporting<br>
+                    <strong>Results:</strong> 40% reduction in audit time, 30% improvement in consistency, 100%
+                    compliance across all sites
+                </div>
+            </div>
+
+            <div class="research-tools">
+                <div class="info-title">📚 Case Study Development Tools</div>
+                <div class="tool-grid">
+                    <div class="tool-card">
+                        <div class="tool-title">Case Study Template</div>
+                        <div class="tool-description">Structured template for developing comprehensive case studies with
+                            problem, solution, and outcomes sections.</div>
+                        <button class="download-btn" onclick="downloadTemplate('case-study-template')">Download
+                            Template</button>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-title">Interview Guide for Case Studies</div>
+                        <div class="tool-description">Semi-structured interview guide for collecting case study data
+                            from audit participants.</div>
+                        <button class="download-btn" onclick="downloadTemplate('case-study-interview-guide')">Download
+                            Guide</button>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-title">Case Study Analysis Framework</div>
+                        <div class="tool-description">Framework for analyzing case study data and extracting meaningful
+                            insights and lessons learned.</div>
+                        <button class="download-btn"
+                            onclick="downloadTemplate('case-study-analysis-framework')">Download Framework</button>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-title">Best Practices Database Template</div>
+                        <div class="tool-description">Template for creating a searchable database of audit best
+                            practices from case studies.</div>
+                        <button class="download-btn"
+                            onclick="downloadTemplate('best-practices-database-template')">Download Template</button>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-title">Lessons Learned Template</div>
+                        <div class="tool-description">Template for documenting and categorizing lessons learned from
+                            audit case studies.</div>
+                        <button class="download-btn" onclick="downloadTemplate('lessons-learned-template')">Download
+                            Template</button>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-title">Case Study Presentation Template</div>
+                        <div class="tool-description">Professional presentation template for sharing case study findings
+                            with stakeholders.</div>
+                        <button class="download-btn"
+                            onclick="downloadTemplate('case-study-presentation-template')">Download Template</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(135deg, #10b981, #059669);"></div>
+                <span>Start/Input</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(135deg, #4f46e5, #7c3aed);"></div>
+                <span>Process</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(135deg, #f59e0b, #d97706);"></div>
+                <span>Decision</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(135deg, #06b6d4, #0891b2);"></div>
+                <span>Document</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(135deg, #ef4444, #dc2626);"></div>
+                <span>End/Output</span>
+            </div>
+        </div>
+
+        <!-- Research Summary Section -->
+        <div
+            style="background: linear-gradient(135deg, #f8f9fa, #e9ecef); border-radius: 15px; padding: 30px; margin-top: 40px;">
+            <h2 style="color: #1e3c72; text-align: center; margin-bottom: 25px;">📚 ISO 19011 Research Framework Summary
+            </h2>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px;">
+                <div
+                    style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                    <h3 style="color: #4f46e5; margin-bottom: 15px;">🎯 Research Focus Areas</h3>
+                    <ul style="color: #555; line-height: 1.6;">
+                        <li><strong>Audit Effectiveness:</strong> Measuring impact on organizational performance</li>
+                        <li><strong>Methodology Comparison:</strong> Traditional vs. risk-based approaches</li>
+                        <li><strong>Competence Development:</strong> Training effectiveness and skill assessment</li>
+                        <li><strong>Technology Integration:</strong> Digital tools and remote auditing</li>
+                        <li><strong>Cultural Factors:</strong> Cross-cultural audit practices</li>
+                        <li><strong>Sustainability:</strong> Environmental and social audit integration</li>
+                    </ul>
+                </div>
+
+                <div
+                    style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                    <h3 style="color: #4f46e5; margin-bottom: 15px;">📊 Research Methodologies</h3>
+                    <ul style="color: #555; line-height: 1.6;">
+                        <li><strong>Quantitative:</strong> Surveys, statistical analysis, performance metrics</li>
+                        <li><strong>Qualitative:</strong> Interviews, focus groups, case studies</li>
+                        <li><strong>Mixed Methods:</strong> Combined approaches for comprehensive insights</li>
+                        <li><strong>Longitudinal:</strong> Long-term studies tracking changes over time</li>
+                        <li><strong>Comparative:</strong> Cross-industry and cross-cultural studies</li>
+                        <li><strong>Action Research:</strong> Collaborative research with practitioners</li>
+                    </ul>
+                </div>
+
+                <div
+                    style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                    <h3 style="color: #4f46e5; margin-bottom: 15px;">🔬 Data Collection Methods</h3>
+                    <ul style="color: #555; line-height: 1.6;">
+                        <li><strong>Primary Data:</strong> Direct observations, interviews, surveys</li>
+                        <li><strong>Secondary Data:</strong> Audit reports, organizational records</li>
+                        <li><strong>Document Analysis:</strong> Policy documents, procedures, standards</li>
+                        <li><strong>Performance Metrics:</strong> KPIs, compliance rates, improvement data</li>
+                        <li><strong>Expert Opinions:</strong> Delphi studies, expert panels</li>
+                        <li><strong>Technology Data:</strong> Digital audit platforms, analytics</li>
+                    </ul>
+                </div>
+
+                <div
+                    style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                    <h3 style="color: #4f46e5; margin-bottom: 15px;">📈 Expected Outcomes</h3>
+                    <ul style="color: #555; line-height: 1.6;">
+                        <li><strong>Improved Practices:</strong> Evidence-based audit methodologies</li>
+                        <li><strong>Enhanced Competence:</strong> Better training and development approaches</li>
+                        <li><strong>Technology Integration:</strong> Digital transformation of audit processes</li>
+                        <li><strong>Standardization:</strong> Consistent approaches across industries</li>
+                        <li><strong>Innovation:</strong> New audit techniques and tools</li>
+                        <li><strong>Knowledge Transfer:</strong> Best practices dissemination</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <p style="color: #666; font-style: italic;">
+                    "The goal of ISO 19011 research is to advance audit management practices through systematic inquiry,
+                    evidence-based findings, and practical applications that enhance organizational effectiveness and
+                    compliance."
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showFlowchart(flowchartId) {
+            // Hide all flowcharts
+            const flowcharts = document.querySelectorAll('.flowchart-container');
+            flowcharts.forEach(fc => fc.classList.remove('active'));
+
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            // Show selected flowchart
+            document.getElementById(flowchartId).classList.add('active');
+
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+
+        function showDetails(element) {
+            // Add highlight animation
+            element.style.transform = 'scale(1.05)';
+            element.style.boxShadow = '0 15px 35px rgba(79, 70, 229, 0.6)';
+
+            // Get step information
+            const title = element.querySelector('.step-title').textContent;
+            const subtitle = element.querySelector('.step-subtitle')?.textContent || '';
+            const tooltip = element.querySelector('.tooltip')?.textContent || '';
+
+            // Reset after animation
+            setTimeout(() => {
+                element.style.transform = '';
+                element.style.boxShadow = '';
+            }, 300);
+
+            // Show detailed information in a modal or panel
+            showDetailedInfo(title, subtitle, tooltip);
+        }
+
+        function showDetailedInfo(title, subtitle, tooltip) {
+            // Create or update detailed info panel
+            let infoPanel = document.getElementById('detailed-info-panel');
+            if (!infoPanel) {
+                infoPanel = document.createElement('div');
+                infoPanel.id = 'detailed-info-panel';
+                infoPanel.style.cssText = `
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background: white;
+                    padding: 30px;
+                    border-radius: 15px;
+                    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+                    z-index: 10000;
+                    max-width: 500px;
+                    max-height: 80vh;
+                    overflow-y: auto;
+                `;
+                document.body.appendChild(infoPanel);
+            }
+
+            // Get detailed information based on title
+            const details = getDetailedInformation(title);
+
+            infoPanel.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3 style="color: #4f46e5; margin: 0;">${title}</h3>
+                    <button onclick="closeDetailedInfo()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #666;">×</button>
+                </div>
+                <div style="color: #666; margin-bottom: 15px;">${subtitle}</div>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                    <strong>Description:</strong> ${tooltip}
+                </div>
+                <div style="line-height: 1.6;">
+                    ${details}
+                </div>
+            `;
+
+            // Add overlay
+            let overlay = document.getElementById('overlay');
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.id = 'overlay';
+                overlay.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0,0,0,0.5);
+                    z-index: 9999;
+                `;
+                overlay.onclick = closeDetailedInfo;
+                document.body.appendChild(overlay);
+            }
+        }
+
+        function closeDetailedInfo() {
+            const infoPanel = document.getElementById('detailed-info-panel');
+            const overlay = document.getElementById('overlay');
+            if (infoPanel) infoPanel.remove();
+            if (overlay) overlay.remove();
+        }
+
+        function getDetailedInformation(title) {
+            const infoDatabase = {
+                '5.3 Establishing Programme': `
+                    <h4>Key Components:</h4>
+                    <ul>
+                        <li><strong>Objectives:</strong> Define what the audit programme aims to achieve</li>
+                        <li><strong>Scope:</strong> Determine what will be audited and what won't</li>
+                        <li><strong>Criteria:</strong> Establish standards against which to audit</li>
+                        <li><strong>Methods:</strong> Choose appropriate audit methodologies</li>
+                    </ul>
+                    <h4>Research Considerations:</h4>
+                    <ul>
+                        <li>How do different organizations establish their audit objectives?</li>
+                        <li>What factors influence scope definition?</li>
+                        <li>How do criteria selection impact audit effectiveness?</li>
+                    </ul>
+                `,
+                '6.4.3 Interviews': `
+                    <h4>Interview Best Practices:</h4>
+                    <ul>
+                        <li>Prepare structured questions based on audit criteria</li>
+                        <li>Use open-ended questions to encourage detailed responses</li>
+                        <li>Document responses accurately and completely</li>
+                        <li>Maintain professional and non-threatening atmosphere</li>
+                    </ul>
+                    <h4>Research Applications:</h4>
+                    <ul>
+                        <li>Interview techniques effectiveness studies</li>
+                        <li>Communication skills impact on audit outcomes</li>
+                        <li>Cultural factors in audit interviews</li>
+                    </ul>
+                `,
+                '7.2.2 Knowledge': `
+                    <h4>Required Knowledge Areas:</h4>
+                    <ul>
+                        <li>ISO management system standards</li>
+                        <li>Audit principles, procedures, and methods</li>
+                        <li>Management system and reference documents</li>
+                        <li>Organizational situations and business processes</li>
+                        <li>Legal, contractual, and regulatory requirements</li>
+                    </ul>
+                    <h4>Research Opportunities:</h4>
+                    <ul>
+                        <li>Knowledge assessment methodologies</li>
+                        <li>Continuous learning effectiveness</li>
+                        <li>Knowledge retention and application</li>
+                    </ul>
+                `,
+                'Integrity': `
+                    <h4>Integrity in Practice:</h4>
+                    <ul>
+                        <li>Honest and responsible conduct in all audit activities</li>
+                        <li>Transparency in relationships and conflicts of interest</li>
+                        <li>Consistent application of ethical standards</li>
+                        <li>Professional behavior and appearance</li>
+                    </ul>
+                    <h4>Research Focus Areas:</h4>
+                    <ul>
+                        <li>Ethical decision-making frameworks</li>
+                        <li>Integrity measurement and assessment</li>
+                        <li>Impact of integrity on audit credibility</li>
+                    </ul>
+                `
+            };
+
+            return infoDatabase[title] || `
+                <p>This step is part of the ISO 19011 audit management framework. 
+                Click on other steps to explore detailed information about specific processes, 
+                or use the research methodology section to understand how to study these concepts.</p>
+            `;
+        }
+
+        function downloadTemplate(templateType) {
+            // Create template content based on type
+            const templates = {
+                'audit-programme-template': {
+                    filename: 'audit_programme_template.pdf',
+                    content: createAuditProgrammeTemplate()
+                },
+                'risk-assessment-matrix': {
+                    filename: 'risk_assessment_matrix.pdf',
+                    content: createRiskAssessmentMatrix()
+                },
+                'performance-dashboard': {
+                    filename: 'performance_dashboard.pdf',
+                    content: createPerformanceDashboard()
+                },
+                'audit-planning-checklist': {
+                    filename: 'audit_planning_checklist.pdf',
+                    content: createAuditPlanningChecklist()
+                },
+                'evidence-collection-forms': {
+                    filename: 'evidence_collection_forms.pdf',
+                    content: createEvidenceCollectionForms()
+                },
+                'audit-report-template': {
+                    filename: 'audit_report_template.pdf',
+                    content: createAuditReportTemplate()
+                },
+                'competence-assessment-matrix': {
+                    filename: 'competence_assessment_matrix.pdf',
+                    content: createCompetenceAssessmentMatrix()
+                },
+                'training-needs-analysis': {
+                    filename: 'training_needs_analysis.pdf',
+                    content: createTrainingNeedsAnalysis()
+                },
+                'performance-evaluation-forms': {
+                    filename: 'performance_evaluation_forms.pdf',
+                    content: createPerformanceEvaluationForms()
+                },
+                'principles-self-assessment': {
+                    filename: 'principles_self_assessment.pdf',
+                    content: createPrinciplesSelfAssessment()
+                },
+                'ethical-decision-framework': {
+                    filename: 'ethical_decision_framework.pdf',
+                    content: createEthicalDecisionFramework()
+                },
+                'principles-training-module': {
+                    filename: 'principles_training_module.pdf',
+                    content: createPrinciplesTrainingModule()
+                },
+                'research-design-template': {
+                    filename: 'research_design_template.pdf',
+                    content: createResearchDesignTemplate()
+                },
+                'data-collection-instruments': {
+                    filename: 'data_collection_instruments.pdf',
+                    content: createDataCollectionInstruments()
+                },
+                'statistical-analysis-guide': {
+                    filename: 'statistical_analysis_guide.pdf',
+                    content: createStatisticalAnalysisGuide()
+                },
+                'literature-review-framework': {
+                    filename: 'literature_review_framework.pdf',
+                    content: createLiteratureReviewFramework()
+                },
+                'research-ethics-checklist': {
+                    filename: 'research_ethics_checklist.pdf',
+                    content: createResearchEthicsChecklist()
+                },
+                'dissemination-strategy-template': {
+                    filename: 'dissemination_strategy_template.pdf',
+                    content: createDisseminationStrategyTemplate()
+                },
+                'case-study-template': {
+                    filename: 'case_study_template.pdf',
+                    content: createCaseStudyTemplate()
+                },
+                'case-study-interview-guide': {
+                    filename: 'case_study_interview_guide.pdf',
+                    content: createCaseStudyInterviewGuide()
+                },
+                'case-study-analysis-framework': {
+                    filename: 'case_study_analysis_framework.pdf',
+                    content: createCaseStudyAnalysisFramework()
+                },
+                'best-practices-database-template': {
+                    filename: 'best_practices_database_template.pdf',
+                    content: createBestPracticesDatabaseTemplate()
+                },
+                'lessons-learned-template': {
+                    filename: 'lessons_learned_template.pdf',
+                    content: createLessonsLearnedTemplate()
+                },
+                'case-study-presentation-template': {
+                    filename: 'case_study_presentation_template.pdf',
+                    content: createCaseStudyPresentationTemplate()
+                }
+            };
+
+            const template = templates[templateType];
+            if (template) {
+                // Create PDF using jsPDF
+                generatePDF(template.content, template.filename);
+            }
+        }
+
+        // PDF generation function using jsPDF
+        function generatePDF(content, filename) {
+            // Show loading indicator
+            const loadingMsg = document.createElement('div');
+            loadingMsg.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: rgba(0,0,0,0.8);
+                color: white;
+                padding: 20px;
+                border-radius: 10px;
+                z-index: 10001;
+                font-size: 16px;
+            `;
+            loadingMsg.textContent = 'Generating PDF... Please wait.';
+            document.body.appendChild(loadingMsg);
+
+            // Load jsPDF UMD if not present
+            if (!window.jspdf || !window.jspdf.jsPDF) {
+                const script = document.createElement('script');
+                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+                script.onload = function () {
+                    createPDFWithContent(content, filename);
+                    document.body.removeChild(loadingMsg);
+                };
+                script.onerror = function() {
+                    alert('Error loading PDF library. Please try again.');
+                    document.body.removeChild(loadingMsg);
+                };
+                document.head.appendChild(script);
+            } else {
+                createPDFWithContent(content, filename);
+                document.body.removeChild(loadingMsg);
+            }
+        }
+
+        function createPDFWithContent(content, filename) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+
+            // Layout constants
+            const margin = 50;
+            const lineHeight = 22;
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+            const textWidth = pageWidth - margin * 2;
+            let y = margin;
+
+            // Title with better styling
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(24);
+            doc.text('ISO 19011 Research Template', pageWidth/2, y, { align: 'center' });
+            y += 40;
+
+            // Extract and display subtitle
+            const titleMatch = content.match(/^([A-Z\s]+TEMPLATE)/);
+            if (titleMatch) {
+                doc.setFontSize(18);
+                doc.text(titleMatch[1], pageWidth/2, y, { align: 'center' });
+                y += 30;
+            }
+
+            // Add a line separator
+            doc.setDrawColor(200, 200, 200);
+            doc.line(margin, y, pageWidth - margin, y);
+            y += 30;
+
+            // Body font
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(11);
+
+            const addPageIfNeeded = (needed = lineHeight) => {
+                if (y + needed > pageHeight - margin) {
+                    doc.addPage();
+                    y = margin;
+                }
+            };
+
+            // Process content line by line
+            const lines = String(content).replace(/\r\n?/g, '\n').split('\n');
+
+            lines.forEach((line) => {
+                const trimmedLine = line.trim();
+                
+                if (trimmedLine === '') {
+                    addPageIfNeeded();
+                    y += 10; // smaller gap for blank lines
+                    return;
+                }
+
+                addPageIfNeeded();
+
+                // Handle different line types
+                if (trimmedLine.match(/^\d+\./)) {
+                    // Numbered section header
+                    doc.setFont('helvetica', 'bold');
+                    doc.setFontSize(14);
+                    const wrapped = doc.splitTextToSize(trimmedLine, textWidth);
+                    doc.text(wrapped[0], margin, y);
+                    y += (wrapped.length * lineHeight) + 8;
+                    doc.setFont('helvetica', 'normal');
+                    doc.setFontSize(11);
+                } else if (trimmedLine.match(/^[A-Z\s]+:$/)) {
+                    // Section header
+                    doc.setFont('helvetica', 'bold');
+                    doc.setFontSize(13);
+                    const wrapped = doc.splitTextToSize(trimmedLine, textWidth);
+                    doc.text(wrapped[0], margin, y);
+                    y += (wrapped.length * lineHeight) + 5;
+                    doc.setFont('helvetica', 'normal');
+                    doc.setFontSize(11);
+                } else if (trimmedLine.startsWith('□ ')) {
+                    // Checkbox item - draw checkbox manually
+                    const text = trimmedLine.substring(2);
+                    const wrapped = doc.splitTextToSize(text, textWidth - 40);
+                    
+                    // Draw checkbox square
+                    doc.rect(margin + 5, y - 8, 12, 12);
+                    doc.text(wrapped[0], margin + 25, y);
+                    y += (wrapped.length * lineHeight) + 2;
+                } else if (trimmedLine.startsWith('• ')) {
+                    // Bullet point
+                    const text = trimmedLine.substring(2);
+                    const bulletText = '• ' + text;
+                    const wrapped = doc.splitTextToSize(bulletText, textWidth - 20);
+                    doc.text(wrapped[0], margin + 20, y);
+                    y += (wrapped.length * lineHeight) + 2;
+                } else if (trimmedLine.includes(':')) {
+                    // Label-value pair
+                    const colonIndex = trimmedLine.indexOf(':');
+                    const label = trimmedLine.substring(0, colonIndex + 1);
+                    const value = trimmedLine.substring(colonIndex + 1).trim();
+                    
+                    if (value) {
+                        doc.setFont('helvetica', 'bold');
+                        doc.text(label, margin, y);
+                        doc.setFont('helvetica', 'normal');
+                        const wrapped = doc.splitTextToSize(value, textWidth - 100);
+                        doc.text(wrapped[0], margin + 100, y);
+                        y += Math.max(lineHeight, wrapped.length * lineHeight) + 2;
+                    } else {
+                        const wrapped = doc.splitTextToSize(trimmedLine, textWidth);
+                        doc.text(wrapped[0], margin, y);
+                        y += (wrapped.length * lineHeight) + 2;
+                    }
+                } else {
+                    // Regular text
+                    const wrapped = doc.splitTextToSize(trimmedLine, textWidth);
+                    doc.text(wrapped[0], margin, y);
+                    y += (wrapped.length * lineHeight) + 2;
+                }
+            });
+
+            doc.save(filename);
+            
+            // Track download analytics
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'download', {
+                    'event_category': 'template',
+                    'event_label': filename
+                });
+            }
+            
+            // Show success message
+            const successMsg = document.createElement('div');
+            successMsg.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #10b981;
+                color: white;
+                padding: 15px 20px;
+                border-radius: 8px;
+                z-index: 10002;
+                font-size: 14px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                animation: slideIn 0.3s ease;
+            `;
+            successMsg.textContent = `✅ ${filename} downloaded successfully!`;
+            document.body.appendChild(successMsg);
+            
+            // Remove success message after 3 seconds
+            setTimeout(() => {
+                if (successMsg.parentNode) {
+                    successMsg.parentNode.removeChild(successMsg);
+                }
+            }, 3000);
+        }
+        
+        // Add CSS animation for success message
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Template content creation functions
+        function createAuditProgrammeTemplate() {
+            return `AUDIT PROGRAMME PLANNING TEMPLATE
+
+1. PROGRAMME OBJECTIVES
+   □ Define clear, measurable objectives
+   □ Align with organizational goals
+   □ Consider stakeholder requirements
+   □ Establish success criteria
+
+2. SCOPE DEFINITION
+   □ Identify audit areas and processes
+   □ Define organizational boundaries
+   □ Consider regulatory requirements
+   □ Determine audit frequency
+
+3. RESOURCE PLANNING
+   □ Human resources (auditors, experts)
+   □ Financial resources (budget allocation)
+   □ Technical resources (tools, software)
+   □ Time allocation and scheduling
+
+4. RISK ASSESSMENT
+   □ Identify high-risk areas
+   □ Evaluate compliance requirements
+   □ Consider previous audit findings
+   □ Assess organizational changes
+
+5. SCHEDULING
+   □ Annual audit calendar
+   □ Resource availability
+   □ Stakeholder availability
+   □ External audit coordination
+
+6. MONITORING AND REVIEW
+   □ Key performance indicators
+   □ Progress tracking
+   □ Effectiveness evaluation
+   □ Continuous improvement
+
+This template provides a structured approach to developing comprehensive audit programmes that align with ISO 19011 requirements and organizational objectives.`;
+        }
+
+        function createRiskAssessmentMatrix() {
+            return `RISK ASSESSMENT MATRIX FOR AUDIT PLANNING
+
+RISK FACTORS TO CONSIDER:
+
+1. COMPLIANCE RISK
+   □ Regulatory requirements
+   □ Industry standards
+   □ Certification requirements
+   □ Legal obligations
+
+2. OPERATIONAL RISK
+   □ Process complexity
+   □ Technology dependencies
+   □ Resource constraints
+   □ Change management
+
+3. REPUTATIONAL RISK
+   □ Customer impact
+   □ Stakeholder expectations
+   □ Public perception
+   □ Brand protection
+
+4. FINANCIAL RISK
+   □ Cost implications
+   □ Resource allocation
+   □ Budget constraints
+   □ ROI considerations
+
+RISK SCORING MATRIX:
+Low Risk (1-3): Annual audits
+Medium Risk (4-6): Semi-annual audits
+High Risk (7-9): Quarterly audits
+Critical Risk (10): Monthly audits
+
+FACTORS INFLUENCING RISK:
+• Process maturity level
+• Previous audit results
+• Organizational changes
+• External pressures
+• Resource availability
+
+This matrix helps organizations prioritize audit activities based on risk assessment and allocate resources effectively.`;
+        }
+
+        function createPerformanceDashboard() {
+            return `AUDIT PROGRAMME PERFORMANCE DASHBOARD
+
+KEY PERFORMANCE INDICATORS (KPIs):
+
+1. AUDIT COMPLETION METRICS
+   □ Planned vs. completed audits
+   □ On-time completion rate
+   □ Resource utilization
+   □ Cost per audit
+
+2. QUALITY METRICS
+   □ Audit findings severity
+   □ Corrective action closure rate
+   □ Stakeholder satisfaction
+   □ Audit team competence
+
+3. EFFECTIVENESS METRICS
+   □ Process improvement rate
+   □ Compliance level changes
+   □ Risk reduction achieved
+   □ Organizational learning
+
+4. EFFICIENCY METRICS
+   □ Audit duration trends
+   □ Resource optimization
+   □ Technology utilization
+   □ Cost effectiveness
+
+DASHBOARD COMPONENTS:
+• Visual charts and graphs
+• Trend analysis
+• Comparative data
+• Action items tracking
+• Progress indicators
+
+REPORTING FREQUENCY:
+• Monthly: Operational metrics
+• Quarterly: Effectiveness review
+• Annually: Strategic assessment
+
+This dashboard provides real-time visibility into audit programme performance and supports data-driven decision making.`;
+        }
+
+        function createAuditPlanningChecklist() {
+            return `AUDIT PLANNING CHECKLIST
+
+PRE-AUDIT PLANNING:
+□ Review audit objectives and scope
+□ Identify audit criteria and standards
+□ Select audit team members
+□ Assign roles and responsibilities
+□ Review previous audit reports
+□ Identify potential risks and challenges
+
+AUDIT TEAM PREPARATION:
+□ Verify auditor competence and independence
+□ Conduct team briefing and coordination
+□ Review audit procedures and methods
+□ Prepare audit documentation and forms
+□ Arrange necessary resources and tools
+□ Confirm logistics and travel arrangements
+
+AUDITEE COMMUNICATION:
+□ Notify auditee of audit schedule
+□ Request necessary documentation
+□ Confirm availability of key personnel
+□ Arrange opening meeting logistics
+□ Communicate audit scope and objectives
+□ Address any concerns or questions
+
+DOCUMENTATION REVIEW:
+□ Review management system documentation
+□ Analyze previous audit findings
+□ Review corrective action status
+□ Identify areas requiring special attention
+□ Prepare audit questions and checklists
+□ Organize audit evidence collection plan
+
+RISK ASSESSMENT:
+□ Identify high-risk areas and processes
+□ Assess potential audit challenges
+□ Plan contingency measures
+□ Consider cultural and language factors
+□ Evaluate security and confidentiality requirements
+□ Plan for unexpected situations
+
+This checklist ensures comprehensive audit planning and preparation in accordance with ISO 19011 requirements.`;
+        }
+
+        function createEvidenceCollectionForms() {
+            return `AUDIT EVIDENCE COLLECTION FORMS
+
+OBSERVATION RECORD FORM:
+Date: ___________  Auditor: ___________  Location: ___________
+
+Process/Activity Observed: ________________________________
+Standard/Criteria: _______________________________________
+
+Observation Details:
+□ What was observed: ____________________________________
+□ How it was performed: _________________________________
+□ Who was involved: ____________________________________
+□ When it occurred: ____________________________________
+□ Where it took place: _________________________________
+
+Evidence Type:
+□ Direct observation
+□ Document review
+□ Interview response
+□ Physical evidence
+□ Electronic data
+
+Compliance Assessment:
+□ Conforms to requirements
+□ Minor nonconformity
+□ Major nonconformity
+□ Opportunity for improvement
+
+INTERVIEW RECORD FORM:
+Interviewee: ___________  Position: ___________  Date: ___________
+
+Questions Asked:
+1. ____________________________________________________
+   Response: ___________________________________________
+
+2. ____________________________________________________
+   Response: ___________________________________________
+
+3. ____________________________________________________
+   Response: ___________________________________________
+
+Key Information Obtained: _______________________________
+Follow-up Actions Required: ______________________________
+
+DOCUMENT REVIEW FORM:
+Document: ___________  Version: ___________  Date: ___________
+
+Review Criteria: ________________________________________
+Compliance Status: □ Compliant □ Non-compliant □ Partial
+
+Findings: _______________________________________________
+Evidence Reference: _____________________________________
+
+This form ensures systematic and consistent evidence collection during audits.`;
+        }
+
+        function createAuditReportTemplate() {
+            return `AUDIT REPORT TEMPLATE
+
+EXECUTIVE SUMMARY:
+Audit Type: ___________  Audit Date: ___________  Auditor: ___________
+Auditee: ___________  Scope: ___________  Duration: ___________
+
+AUDIT OBJECTIVES:
+• ____________________________________________________
+• ____________________________________________________
+• ____________________________________________________
+
+AUDIT SCOPE:
+• Processes audited: ___________________________________
+• Locations visited: ___________________________________
+• Personnel interviewed: _______________________________
+• Documents reviewed: _________________________________
+
+AUDIT METHODOLOGY:
+• Audit approach used: _________________________________
+• Evidence collection methods: __________________________
+• Sampling methodology: _______________________________
+
+FINDINGS SUMMARY:
+Total Findings: ___  Major: ___  Minor: ___  Opportunities: ___
+
+MAJOR NONCONFORMITIES:
+1. Finding: ___________________________________________
+   Evidence: __________________________________________
+   Requirement: _______________________________________
+   Impact: ____________________________________________
+
+2. Finding: ___________________________________________
+   Evidence: __________________________________________
+   Requirement: _______________________________________
+   Impact: ____________________________________________
+
+MINOR NONCONFORMITIES:
+1. Finding: ___________________________________________
+   Evidence: __________________________________________
+   Recommendation: ____________________________________
+
+OPPORTUNITIES FOR IMPROVEMENT:
+1. Area: _____________________________________________
+   Suggestion: ________________________________________
+   Expected Benefit: ___________________________________
+
+CONCLUSIONS:
+Overall assessment: ____________________________________
+Compliance status: ____________________________________
+Recommendations: _____________________________________
+
+This template provides a structured format for comprehensive audit reporting.`;
+        }
+
+        function createCompetenceAssessmentMatrix() {
+            return `AUDITOR COMPETENCE ASSESSMENT MATRIX
+
+COMPETENCE AREAS:
+
+1. KNOWLEDGE (K)
+   □ ISO management system standards
+   □ Audit principles and procedures
+   □ Industry-specific requirements
+   □ Legal and regulatory frameworks
+   □ Organizational processes
+
+2. SKILLS (S)
+   □ Communication and interviewing
+   □ Analytical thinking and problem-solving
+   □ Report writing and documentation
+   □ Time management and planning
+   □ Conflict resolution and diplomacy
+
+3. PERSONAL ATTRIBUTES (PA)
+   □ Ethical behavior and integrity
+   □ Objectivity and impartiality
+   □ Professional judgment
+   □ Cultural sensitivity
+   □ Continuous learning attitude
+
+ASSESSMENT SCALE:
+1 = No competence demonstrated
+2 = Basic awareness
+3 = Some competence
+4 = Competent
+5 = Highly competent
+
+ASSESSMENT METHODS:
+□ Written examinations
+□ Practical assessments
+□ Peer reviews
+□ Client feedback
+□ Performance observations
+□ Self-assessment
+
+DEVELOPMENT PLANNING:
+□ Training needs identification
+□ Mentoring and coaching
+□ Experience opportunities
+□ Professional development
+□ Competence maintenance
+
+This matrix provides a systematic approach to evaluating and developing auditor competence.`;
+        }
+
+        function createTrainingNeedsAnalysis() {
+            return `TRAINING NEEDS ANALYSIS TEMPLATE
+
+AUDITOR PROFILE:
+Name: ___________  Position: ___________  Experience: ___________
+
+CURRENT COMPETENCE ASSESSMENT:
+
+1. TECHNICAL KNOWLEDGE:
+   □ ISO standards understanding: ___/5
+   □ Industry-specific knowledge: ___/5
+   □ Audit methodology: ___/5
+   □ Regulatory requirements: ___/5
+
+2. AUDIT SKILLS:
+   □ Interviewing techniques: ___/5
+   □ Evidence collection: ___/5
+   □ Report writing: ___/5
+   □ Time management: ___/5
+
+3. PERSONAL ATTRIBUTES:
+   □ Communication: ___/5
+   □ Objectivity: ___/5
+   □ Professional judgment: ___/5
+   □ Cultural sensitivity: ___/5
+
+GAP ANALYSIS:
+Identified gaps: _________________________________________
+Priority areas: __________________________________________
+Development timeline: ____________________________________
+
+TRAINING RECOMMENDATIONS:
+□ Formal training courses: _______________________________
+□ On-the-job training: __________________________________
+□ Mentoring/coaching: ___________________________________
+□ Self-study materials: _________________________________
+□ Professional development: ______________________________
+
+SUCCESS CRITERIA:
+□ Competence improvement targets: _______________________
+□ Assessment methods: __________________________________
+□ Timeline for achievement: ______________________________
+
+This template helps identify specific training needs and develop targeted development plans.`;
+        }
+
+        function createPerformanceEvaluationForms() {
+            return `AUDITOR PERFORMANCE EVALUATION FORM
+
+EVALUATION PERIOD: ___________ to ___________
+AUDITOR: ___________  EVALUATOR: ___________  DATE: ___________
+
+PERFORMANCE CRITERIA:
+
+1. TECHNICAL COMPETENCE (25%)
+   □ Knowledge of standards and requirements
+   □ Understanding of audit methodology
+   □ Technical accuracy of findings
+   □ Quality of audit documentation
+   Score: ___/25  Comments: _______________________________
+
+2. AUDIT EXECUTION (25%)
+   □ Planning and preparation effectiveness
+   □ Evidence collection thoroughness
+   □ Interview and communication skills
+   □ Time management and efficiency
+   Score: ___/25  Comments: _______________________________
+
+3. PROFESSIONAL CONDUCT (20%)
+   □ Ethical behavior and integrity
+   □ Objectivity and impartiality
+   □ Professional appearance and demeanor
+   □ Confidentiality maintenance
+   Score: ___/20  Comments: _______________________________
+
+4. TEAMWORK AND COLLABORATION (15%)
+   □ Cooperation with team members
+   □ Communication with auditee
+   □ Contribution to team objectives
+   □ Knowledge sharing
+   Score: ___/15  Comments: _______________________________
+
+5. CONTINUOUS IMPROVEMENT (15%)
+   □ Learning from experience
+   □ Application of feedback
+   □ Professional development
+   □ Innovation and improvement
+   Score: ___/15  Comments: _______________________________
+
+TOTAL SCORE: ___/100
+
+OVERALL ASSESSMENT:
+□ Exceeds expectations (90-100)
+□ Meets expectations (70-89)
+□ Below expectations (50-69)
+□ Unsatisfactory (Below 50)
+
+STRENGTHS: _______________________________________________
+AREAS FOR IMPROVEMENT: ___________________________________
+DEVELOPMENT PLAN: ________________________________________
+
+This form provides a comprehensive evaluation of auditor performance and development needs.`;
+        }
+
+        function createPrinciplesSelfAssessment() {
+            return `AUDIT PRINCIPLES SELF-ASSESSMENT TOOL
+
+SEVEN PRINCIPLES OF AUDITING:
+
+1. INTEGRITY
+   □ I maintain honest and responsible conduct
+   □ I am transparent about relationships and conflicts
+   □ I apply ethical standards consistently
+   □ I demonstrate professional behavior
+   Self-Rating: ___/5  Comments: _______________________________
+
+2. FAIR PRESENTATION
+   □ I report findings truthfully and accurately
+   □ I present balanced views of strengths and weaknesses
+   □ I provide complete and relevant information
+   □ I avoid bias in my reporting
+   Self-Rating: ___/5  Comments: _______________________________
+
+3. DUE PROFESSIONAL CARE
+   □ I exercise diligence and professional judgment
+   □ I apply appropriate skills and knowledge
+   □ I plan and conduct audits thoroughly
+   □ I maintain professional skepticism
+   Self-Rating: ___/5  Comments: _______________________________
+
+4. CONFIDENTIALITY
+   □ I protect confidential information
+   □ I use information only for intended purposes
+   □ I maintain discretion in all communications
+   □ I respect privacy and data protection
+   Self-Rating: ___/5  Comments: _______________________________
+
+5. INDEPENDENCE
+   □ I maintain objectivity and impartiality
+   □ I avoid conflicts of interest
+   □ I make decisions free from bias
+   □ I demonstrate independence in judgment
+   Self-Rating: ___/5  Comments: _______________________________
+
+6. EVIDENCE-BASED APPROACH
+   □ I base conclusions on verifiable evidence
+   □ I use systematic methods for evidence collection
+   □ I ensure evidence is reliable and relevant
+   □ I document evidence appropriately
+   Self-Rating: ___/5  Comments: _______________________________
+
+7. RISK-BASED APPROACH
+   □ I consider organizational context and risks
+   □ I focus on high-risk areas and processes
+   □ I adapt audit approach based on risk assessment
+   □ I identify opportunities for improvement
+   Self-Rating: ___/5  Comments: _______________________________
+
+TOTAL SCORE: ___/35
+
+OVERALL ASSESSMENT:
+□ Excellent (30-35)
+□ Good (25-29)
+□ Satisfactory (20-24)
+□ Needs Improvement (Below 20)
+
+DEVELOPMENT AREAS: _______________________________________
+ACTION PLAN: _____________________________________________
+
+This tool helps auditors assess their adherence to the seven principles of auditing.`;
+        }
+
+        function createEthicalDecisionFramework() {
+            return `ETHICAL DECISION FRAMEWORK FOR AUDITORS
+
+DECISION-MAKING PROCESS:
+
+1. IDENTIFY THE ETHICAL ISSUE
+   □ What is the ethical dilemma?
+   □ Who are the stakeholders involved?
+   □ What are the potential consequences?
+   □ What are the relevant facts?
+
+2. APPLY RELEVANT PRINCIPLES
+   □ Integrity and honesty
+   □ Objectivity and independence
+   □ Professional competence
+   □ Confidentiality
+   □ Fair presentation
+
+3. CONSIDER ALTERNATIVES
+   □ What are the possible courses of action?
+   □ What are the pros and cons of each?
+   □ Which option best aligns with principles?
+   □ What are the potential risks?
+
+4. EVALUATE CONSEQUENCES
+   □ Impact on stakeholders
+   □ Effect on audit credibility
+   □ Organizational implications
+   □ Professional reputation
+
+5. MAKE THE DECISION
+   □ Choose the most ethical option
+   □ Document the decision process
+   □ Implement the decision
+   □ Monitor outcomes
+
+COMMON ETHICAL CHALLENGES:
+□ Conflicts of interest
+□ Pressure to modify findings
+□ Confidentiality breaches
+□ Inadequate competence
+□ Bias and prejudice
+□ Resource constraints
+
+RESOLUTION STRATEGIES:
+□ Consult with supervisors
+□ Seek expert advice
+□ Document all decisions
+□ Maintain transparency
+□ Follow established procedures
+
+This framework provides a structured approach to ethical decision-making in audit situations.`;
+        }
+
+        function createPrinciplesTrainingModule() {
+            return `AUDIT PRINCIPLES TRAINING MODULE
+
+MODULE OBJECTIVES:
+• Understand the seven principles of auditing
+• Apply principles in practical audit situations
+• Develop ethical decision-making skills
+• Enhance professional conduct
+
+LEARNING CONTENT:
+
+1. PRINCIPLE 1: INTEGRITY
+   Definition: Honest and responsible conduct
+   Key behaviors: Transparency, ethical standards, professional appearance
+   Case study: Handling conflicts of interest
+   Practical exercises: Ethical scenarios
+
+2. PRINCIPLE 2: FAIR PRESENTATION
+   Definition: Truthful and accurate reporting
+   Key behaviors: Balanced reporting, complete information, unbiased presentation
+   Case study: Reporting difficult findings
+   Practical exercises: Report writing scenarios
+
+3. PRINCIPLE 3: DUE PROFESSIONAL CARE
+   Definition: Diligent and skilled performance
+   Key behaviors: Thorough planning, professional judgment, appropriate skills
+   Case study: Managing time constraints
+   Practical exercises: Planning scenarios
+
+4. PRINCIPLE 4: CONFIDENTIALITY
+   Definition: Information security and discretion
+   Key behaviors: Data protection, appropriate use, privacy respect
+   Case study: Handling sensitive information
+   Practical exercises: Confidentiality scenarios
+
+5. PRINCIPLE 5: INDEPENDENCE
+   Definition: Objectivity and impartiality
+   Key behaviors: Unbiased decisions, conflict avoidance, independent judgment
+   Case study: Maintaining independence
+   Practical exercises: Independence scenarios
+
+6. PRINCIPLE 6: EVIDENCE-BASED APPROACH
+   Definition: Verifiable and systematic evidence
+   Key behaviors: Reliable evidence, systematic methods, proper documentation
+   Case study: Evidence collection challenges
+   Practical exercises: Evidence scenarios
+
+7. PRINCIPLE 7: RISK-BASED APPROACH
+   Definition: Context and risk consideration
+   Key behaviors: Risk assessment, focused approach, opportunity identification
+   Case study: Risk-based audit planning
+   Practical exercises: Risk assessment scenarios
+
+ASSESSMENT METHODS:
+□ Knowledge tests
+□ Practical exercises
+□ Case study analysis
+□ Role-playing scenarios
+□ Self-assessment tools
+
+This module provides comprehensive training on audit principles and their practical application.`;
+        }
+
+        function createResearchDesignTemplate() {
+            return `RESEARCH DESIGN TEMPLATE FOR ISO 19011 STUDIES
+
+RESEARCH TITLE: ___________________________________________
+
+RESEARCH OBJECTIVES:
+Primary Objective: _________________________________________
+Secondary Objectives:
+1. ____________________________________________________
+2. ____________________________________________________
+3. ____________________________________________________
+
+RESEARCH QUESTIONS:
+1. ____________________________________________________
+2. ____________________________________________________
+3. ____________________________________________________
+
+RESEARCH METHODOLOGY:
+□ Quantitative research
+□ Qualitative research
+□ Mixed methods research
+□ Case study research
+□ Action research
+
+POPULATION AND SAMPLE:
+Target Population: _________________________________________
+Sample Size: _____________________________________________
+Sampling Method: _________________________________________
+Inclusion Criteria: ________________________________________
+Exclusion Criteria: ________________________________________
+
+DATA COLLECTION METHODS:
+□ Surveys and questionnaires
+□ Semi-structured interviews
+□ Focus groups
+□ Document analysis
+□ Observations
+□ Performance metrics
+
+DATA ANALYSIS APPROACH:
+□ Statistical analysis
+□ Content analysis
+□ Thematic analysis
+□ Comparative analysis
+□ Trend analysis
+
+ETHICAL CONSIDERATIONS:
+□ Informed consent
+□ Confidentiality protection
+□ Data security
+□ Conflict of interest
+□ Research integrity
+
+TIMELINE:
+Phase 1 (Planning): ___________ to ___________
+Phase 2 (Data Collection): ___________ to ___________
+Phase 3 (Analysis): ___________ to ___________
+Phase 4 (Reporting): ___________ to ___________
+
+This template provides a structured approach to designing ISO 19011 research studies.`;
+        }
+
+        function createDataCollectionInstruments() {
+            return `DATA COLLECTION INSTRUMENTS FOR AUDIT RESEARCH
+
+SURVEY QUESTIONNAIRE TEMPLATE:
+
+SECTION 1: DEMOGRAPHIC INFORMATION
+1. Organization type: □ Manufacturing □ Services □ Public Sector
+2. Organization size: □ Small □ Medium □ Large
+3. Years of audit experience: □ 0-2 □ 3-5 □ 6-10 □ 10+
+4. Audit role: □ Lead Auditor □ Team Member □ Technical Expert
+
+SECTION 2: AUDIT EFFECTIVENESS
+Rate the effectiveness of audit processes (1=Very Poor, 5=Excellent):
+□ Audit planning effectiveness: ___/5
+□ Evidence collection methods: ___/5
+□ Report quality and usefulness: ___/5
+□ Follow-up and corrective actions: ___/5
+
+SECTION 3: COMPETENCE ASSESSMENT
+Rate your competence in the following areas (1=Low, 5=High):
+□ Technical knowledge: ___/5
+□ Communication skills: ___/5
+□ Analytical thinking: ___/5
+□ Cultural sensitivity: ___/5
+
+INTERVIEW GUIDE TEMPLATE:
+Opening Questions:
+• Can you describe your audit experience?
+• What challenges do you face in audit execution?
+• How do you ensure audit quality?
+
+Main Questions:
+• What factors contribute to audit success?
+• How do you handle difficult audit situations?
+• What improvements would you suggest?
+
+Closing Questions:
+• What additional support do you need?
+• Any other comments or suggestions?
+
+OBSERVATION CHECKLIST:
+□ Auditor preparation and planning
+□ Communication with auditee
+□ Evidence collection methods
+□ Documentation quality
+□ Professional conduct
+□ Time management
+□ Team coordination
+
+This template provides standardized instruments for collecting research data.`;
+        }
+
+        function createStatisticalAnalysisGuide() {
+            return `STATISTICAL ANALYSIS GUIDE FOR AUDIT RESEARCH
+
+DESCRIPTIVE STATISTICS:
+• Mean, median, mode for continuous variables
+• Frequency distributions for categorical variables
+• Standard deviation and variance
+• Percentiles and quartiles
+
+INFERENTIAL STATISTICS:
+• T-tests for comparing means
+• Chi-square tests for categorical data
+• Correlation analysis for relationships
+• Regression analysis for predictions
+
+DATA VISUALIZATION:
+• Bar charts for categorical data
+• Histograms for distributions
+• Scatter plots for relationships
+• Box plots for comparisons
+
+SOFTWARE TOOLS:
+□ SPSS for comprehensive analysis
+□ R for advanced statistics
+□ Excel for basic analysis
+□ Python for custom analysis
+
+ANALYSIS WORKFLOW:
+1. Data cleaning and preparation
+2. Exploratory data analysis
+3. Descriptive statistics
+4. Hypothesis testing
+5. Model building
+6. Results interpretation
+
+QUALITY CHECKS:
+□ Data accuracy verification
+□ Outlier identification
+□ Missing data handling
+□ Assumption testing
+□ Result validation
+
+REPORTING STANDARDS:
+□ Clear methodology description
+□ Statistical significance levels
+□ Effect size measures
+□ Confidence intervals
+□ Limitations acknowledgment
+
+This guide provides a systematic approach to analyzing audit research data.`;
+        }
+
+        function createLiteratureReviewFramework() {
+            return `LITERATURE REVIEW FRAMEWORK FOR AUDIT RESEARCH
+
+REVIEW OBJECTIVES:
+□ Identify research gaps in audit management
+□ Understand current best practices
+□ Analyze methodological approaches
+□ Synthesize findings and recommendations
+
+SEARCH STRATEGY:
+Databases to search:
+□ Academic databases (Scopus, Web of Science)
+□ Professional databases (IEEE, ACM)
+□ Industry publications
+□ Conference proceedings
+□ Government reports
+
+Search terms:
+□ "ISO 19011" AND "audit management"
+□ "audit effectiveness" AND "performance"
+□ "auditor competence" AND "development"
+□ "audit principles" AND "ethics"
+□ "audit methodology" AND "improvement"
+
+INCLUSION CRITERIA:
+□ Peer-reviewed publications
+□ Published within last 10 years
+□ Relevant to audit management
+□ Empirical research studies
+□ ISO 19011 related content
+
+EXCLUSION CRITERIA:
+□ Non-English publications
+□ Opinion pieces only
+□ Unrelated to audit management
+□ Poor methodology
+□ Outdated information
+
+ANALYSIS FRAMEWORK:
+1. Thematic analysis
+2. Chronological review
+3. Methodological comparison
+4. Gap identification
+5. Synthesis and recommendations
+
+QUALITY ASSESSMENT:
+□ Research design quality
+□ Sample size adequacy
+□ Methodology appropriateness
+□ Statistical rigor
+□ Practical relevance
+
+This framework provides a systematic approach to conducting literature reviews in audit research.`;
+        }
+
+        function createResearchEthicsChecklist() {
+            return `RESEARCH ETHICS CHECKLIST FOR AUDIT STUDIES
+
+ETHICAL PRINCIPLES:
+□ Respect for persons
+□ Beneficence (do good)
+□ Non-maleficence (do no harm)
+□ Justice and fairness
+
+INFORMED CONSENT:
+□ Clear explanation of research purpose
+□ Voluntary participation
+□ Right to withdraw
+□ Understanding of risks and benefits
+□ Consent documentation
+
+CONFIDENTIALITY:
+□ Data protection measures
+□ Anonymization procedures
+□ Secure storage systems
+□ Access restrictions
+□ Disposal protocols
+
+CONFLICT OF INTEREST:
+□ Disclosure of relationships
+□ Independence maintenance
+□ Bias avoidance
+□ Transparency in reporting
+□ Professional boundaries
+
+DATA INTEGRITY:
+□ Accurate data collection
+□ Honest reporting
+□ No fabrication or falsification
+□ Proper attribution
+□ Reproducible methods
+
+PARTICIPANT PROTECTION:
+□ Minimal risk exposure
+□ Privacy protection
+□ Cultural sensitivity
+□ Vulnerable group protection
+□ Emergency procedures
+
+RESEARCH OVERSIGHT:
+□ Ethics committee approval
+□ Regular monitoring
+□ Incident reporting
+□ Compliance verification
+□ Documentation maintenance
+
+This checklist ensures ethical conduct in audit research studies.`;
+        }
+
+        function createDisseminationStrategyTemplate() {
+            return `RESEARCH DISSEMINATION STRATEGY TEMPLATE
+
+TARGET AUDIENCES:
+□ Academic community
+□ Industry practitioners
+□ Policy makers
+□ Professional associations
+□ Training organizations
+
+DISSEMINATION CHANNELS:
+
+ACADEMIC PUBLICATION:
+□ Peer-reviewed journals
+□ Conference presentations
+□ Book chapters
+□ Research reports
+□ Working papers
+
+PROFESSIONAL OUTLETS:
+□ Industry magazines
+□ Professional newsletters
+□ Webinars and workshops
+□ Training materials
+□ Best practice guides
+
+DIGITAL PLATFORMS:
+□ Research repositories
+□ Professional networks
+□ Social media
+□ Webinars
+□ Online courses
+
+TIMELINE:
+Phase 1 (3 months): Academic publications
+Phase 2 (6 months): Conference presentations
+Phase 3 (9 months): Industry dissemination
+Phase 4 (12 months): Training and implementation
+
+SUCCESS METRICS:
+□ Publication citations
+□ Download statistics
+□ Presentation invitations
+□ Implementation requests
+□ Impact on practice
+
+IMPLEMENTATION SUPPORT:
+□ Training workshops
+□ Consulting services
+□ Tool development
+□ Best practice guides
+□ Follow-up studies
+
+This template provides a comprehensive strategy for disseminating audit research findings.`;
+        }
+
+        function createCaseStudyTemplate() {
+            return `CASE STUDY TEMPLATE FOR AUDIT RESEARCH
+
+CASE STUDY TITLE: __________________________________________
+
+EXECUTIVE SUMMARY:
+Brief description of the case study and key findings (150-200 words)
+
+BACKGROUND:
+□ Organization profile and context
+□ Industry and sector information
+□ Organizational challenges
+□ Audit programme objectives
+
+METHODOLOGY:
+□ Research approach used
+□ Data collection methods
+□ Analysis framework
+□ Ethical considerations
+
+CASE DESCRIPTION:
+□ Audit programme design
+□ Implementation approach
+□ Key stakeholders involved
+□ Timeline and milestones
+
+FINDINGS AND RESULTS:
+□ Audit effectiveness outcomes
+□ Performance improvements
+□ Challenges encountered
+□ Lessons learned
+
+ANALYSIS:
+□ Success factors identified
+□ Critical success factors
+□ Barriers and obstacles
+□ Risk management approaches
+
+RECOMMENDATIONS:
+□ Best practices for similar organizations
+□ Implementation guidance
+□ Risk mitigation strategies
+□ Continuous improvement suggestions
+
+CONCLUSIONS:
+□ Key takeaways
+□ Practical implications
+□ Research contributions
+□ Future research directions
+
+This template provides a structured format for developing comprehensive case studies.`;
+        }
+
+        function createCaseStudyInterviewGuide() {
+            return `CASE STUDY INTERVIEW GUIDE
+
+INTERVIEW PREPARATION:
+□ Review case study objectives
+□ Prepare interview questions
+□ Schedule appropriate time
+□ Confirm participant availability
+□ Prepare recording equipment
+
+OPENING QUESTIONS:
+• Can you describe your role in the audit programme?
+• What were the main objectives of the audit initiative?
+• What challenges did your organization face initially?
+
+MAIN INTERVIEW QUESTIONS:
+
+AUDIT PROGRAMME DESIGN:
+• How was the audit programme structured?
+• What factors influenced the design decisions?
+• How did you ensure alignment with organizational goals?
+
+IMPLEMENTATION PROCESS:
+• What was the implementation timeline?
+• How did you manage stakeholder engagement?
+• What resources were allocated to the programme?
+
+CHALLENGES AND SOLUTIONS:
+• What were the main challenges encountered?
+• How were these challenges addressed?
+• What would you do differently?
+
+OUTCOMES AND IMPACT:
+• What were the key outcomes achieved?
+• How did the programme impact organizational performance?
+• What metrics were used to measure success?
+
+LESSONS LEARNED:
+• What were the most important lessons learned?
+• What advice would you give to similar organizations?
+• What factors contributed most to success?
+
+CLOSING QUESTIONS:
+• Is there anything else you'd like to share?
+• Can I follow up with additional questions if needed?
+• Do you have any recommendations for further research?
+
+This guide ensures comprehensive data collection for case study development.`;
+        }
+
+        function createCaseStudyAnalysisFramework() {
+            return `CASE STUDY ANALYSIS FRAMEWORK
+
+ANALYSIS APPROACH:
+□ Thematic analysis
+□ Comparative analysis
+□ Pattern recognition
+□ Cross-case analysis
+□ Theory development
+
+ANALYSIS DIMENSIONS:
+
+1. CONTEXTUAL FACTORS:
+   □ Organizational characteristics
+   □ Industry environment
+   □ Regulatory requirements
+   □ Cultural factors
+
+2. IMPLEMENTATION FACTORS:
+   □ Leadership commitment
+   □ Resource allocation
+   □ Change management
+   □ Stakeholder engagement
+
+3. PROCESS FACTORS:
+   □ Audit methodology
+   □ Quality assurance
+   □ Communication
+   □ Documentation
+
+4. OUTCOME FACTORS:
+   □ Performance improvements
+   □ Compliance achievements
+   □ Cost effectiveness
+   □ Stakeholder satisfaction
+
+ANALYSIS TOOLS:
+□ SWOT analysis
+□ Root cause analysis
+□ Impact assessment
+□ Risk analysis
+□ Cost-benefit analysis
+
+PATTERN IDENTIFICATION:
+□ Common success factors
+□ Recurring challenges
+□ Best practices
+□ Critical success factors
+□ Implementation barriers
+
+THEORY DEVELOPMENT:
+□ Conceptual framework
+□ Hypotheses generation
+□ Model development
+□ Validation approaches
+□ Generalization potential
+
+This framework provides a systematic approach to analyzing case study data.`;
+        }
+
+        function createBestPracticesDatabaseTemplate() {
+            return `BEST PRACTICES DATABASE TEMPLATE
+
+DATABASE STRUCTURE:
+
+ORGANIZATION PROFILE:
+□ Organization name and type
+□ Industry sector
+□ Size and scope
+□ Geographic location
+□ Audit programme maturity
+
+AUDIT PROGRAMME CHARACTERISTICS:
+□ Programme objectives
+□ Scope and coverage
+□ Resource allocation
+□ Timeline and frequency
+□ Stakeholder involvement
+
+IMPLEMENTATION APPROACH:
+□ Methodology used
+□ Tools and techniques
+□ Quality assurance
+□ Risk management
+□ Change management
+
+SUCCESS FACTORS:
+□ Leadership support
+□ Competent personnel
+□ Adequate resources
+□ Clear communication
+□ Continuous improvement
+
+CHALLENGES ENCOUNTERED:
+□ Resource constraints
+□ Resistance to change
+□ Technical difficulties
+□ Cultural barriers
+□ Regulatory compliance
+
+SOLUTIONS IMPLEMENTED:
+□ Problem-solving approaches
+□ Innovation and creativity
+□ Stakeholder engagement
+□ Process improvements
+□ Technology adoption
+
+OUTCOMES AND IMPACT:
+□ Performance metrics
+□ Compliance achievements
+□ Cost savings
+□ Quality improvements
+□ Stakeholder satisfaction
+
+LESSONS LEARNED:
+□ Key insights
+□ Recommendations
+□ Implementation tips
+□ Risk mitigation
+□ Success strategies
+
+This template provides a structured database for capturing and sharing audit best practices.`;
+        }
+
+        function createLessonsLearnedTemplate() {
+            return `LESSONS LEARNED TEMPLATE
+
+PROJECT INFORMATION:
+Project Name: _____________________________________________
+Organization: ____________________________________________
+Date: ___________  Duration: ___________  Status: ___________
+
+LESSONS LEARNED CATEGORIES:
+
+1. PLANNING AND DESIGN:
+   □ What worked well: ____________________________________
+   □ What didn't work: ____________________________________
+   □ Recommendations: ____________________________________
+
+2. IMPLEMENTATION:
+   □ What worked well: ____________________________________
+   □ What didn't work: ____________________________________
+   □ Recommendations: ____________________________________
+
+3. RESOURCE MANAGEMENT:
+   □ What worked well: ____________________________________
+   □ What didn't work: ____________________________________
+   □ Recommendations: ____________________________________
+
+4. STAKEHOLDER ENGAGEMENT:
+   □ What worked well: ____________________________________
+   □ What didn't work: ____________________________________
+   □ Recommendations: ____________________________________
+
+5. QUALITY ASSURANCE:
+   □ What worked well: ____________________________________
+   □ What didn't work: ____________________________________
+   □ Recommendations: ____________________________________
+
+6. RISK MANAGEMENT:
+   □ What worked well: ____________________________________
+   □ What didn't work: ____________________________________
+   □ Recommendations: ____________________________________
+
+ACTION ITEMS:
+□ Immediate actions: ______________________________________
+□ Short-term improvements: _______________________________
+□ Long-term recommendations: _____________________________
+
+DISSEMINATION PLAN:
+□ Share with team members
+□ Update procedures
+□ Training implications
+□ Future project applications
+
+This template helps capture and apply lessons learned from audit projects.`;
+        }
+
+        function createCaseStudyPresentationTemplate() {
+            return `CASE STUDY PRESENTATION TEMPLATE
+
+PRESENTATION STRUCTURE:
+
+SLIDE 1: TITLE SLIDE
+□ Case study title
+□ Organization name
+□ Presenter information
+□ Date and venue
+
+SLIDE 2: EXECUTIVE SUMMARY
+□ Key findings
+□ Main outcomes
+□ Critical success factors
+□ Recommendations
+
+SLIDE 3: BACKGROUND
+□ Organization profile
+□ Industry context
+□ Challenges faced
+□ Objectives
+
+SLIDE 4: METHODOLOGY
+□ Research approach
+□ Data collection methods
+□ Analysis framework
+□ Ethical considerations
+
+SLIDE 5: IMPLEMENTATION
+□ Programme design
+□ Implementation approach
+□ Timeline and milestones
+□ Key activities
+
+SLIDE 6: RESULTS AND OUTCOMES
+□ Performance improvements
+□ Quantitative results
+□ Qualitative outcomes
+□ Impact assessment
+
+SLIDE 7: ANALYSIS
+□ Success factors
+□ Challenges encountered
+□ Solutions implemented
+□ Lessons learned
+
+SLIDE 8: RECOMMENDATIONS
+□ Best practices
+□ Implementation guidance
+□ Risk mitigation
+□ Future considerations
+
+SLIDE 9: CONCLUSIONS
+□ Key takeaways
+□ Practical implications
+□ Research contributions
+□ Next steps
+
+PRESENTATION TIPS:
+□ Use clear visuals
+□ Include relevant data
+□ Tell a compelling story
+□ Engage the audience
+□ Allow time for questions
+
+This template provides a structured format for presenting case study findings.`;
+        }
+
+        // Add smooth animations on load
+        document.addEventListener('DOMContentLoaded', function () {
+            const steps = document.querySelectorAll('.flow-step');
+            steps.forEach((step, index) => {
+                step.style.animationDelay = `${index * 0.1}s`;
+            });
+        });
+    </script>
+</body>
+
+</html>
