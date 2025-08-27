@@ -1,6 +1,7 @@
 {
   "version": 2,
   "name": "iso-19011-auditing-ms",
+  "outputDirectory": ".",
   "rewrites": [
     {
       "source": "/(.*)",
