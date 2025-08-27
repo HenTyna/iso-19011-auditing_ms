@@ -4,32 +4,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Interactive ISO 19011 Audit Management System with research tools, templates, and comprehensive flowcharts for audit professionals and researchers.">
-    <meta name="keywords" content="ISO 19011, audit management, quality management, audit tools, research templates, audit flowcharts">
+    <meta name="description"
+        content="Interactive ISO 19011 Audit Management System with research tools, templates, and comprehensive flowcharts for audit professionals and researchers.">
+    <meta name="keywords"
+        content="ISO 19011, audit management, quality management, audit tools, research templates, audit flowcharts">
     <meta name="author" content="ISO 19011 Research Team">
     <meta name="robots" content="index, follow">
-    
+
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://your-domain.vercel.app/">
     <meta property="og:title" content="ISO 19011 Interactive Audit Management System">
-    <meta property="og:description" content="Comprehensive interactive tools and templates for ISO 19011 audit management and research.">
+    <meta property="og:description"
+        content="Comprehensive interactive tools and templates for ISO 19011 audit management and research.">
     <meta property="og:image" content="https://your-domain.vercel.app/og-image.png">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://your-domain.vercel.app/">
     <meta property="twitter:title" content="ISO 19011 Interactive Audit Management System">
-    <meta property="twitter:description" content="Comprehensive interactive tools and templates for ISO 19011 audit management and research.">
+    <meta property="twitter:description"
+        content="Comprehensive interactive tools and templates for ISO 19011 audit management and research.">
     <meta property="twitter:image" content="https://your-domain.vercel.app/og-image.png">
-    
+
     <title>ISO 19011 - Interactive Process Flowcharts</title>
-    
+
     <!-- Preload critical resources -->
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" as="script">
-    
+
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📋</text></svg>">
+    <link rel="icon" type="image/x-icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📋</text></svg>">
     <style>
         * {
             margin: 0;
@@ -1419,7 +1424,7 @@
                 <span>End/Output</span>
             </div>
         </div>
-
+        
         <!-- Research Summary Section -->
         <div
             style="background: linear-gradient(135deg, #f8f9fa, #e9ecef); border-radius: 15px; padding: 30px; margin-top: 40px;">
@@ -1487,6 +1492,20 @@
                     compliance."
                 </p>
             </div>
+        </div>
+        <div class="footer">
+            
+            <p>© 2025 ISO 19011 Research By Ly Sokheang. All rights reserved.</p>
+            <p>
+                Download file ISO 19011-audit management system:
+                <button type="button" 
+                    style="background: none; border: none; font-size: 16px; cursor: pointer; color: #202bff; text-decoration: underline; text-underline-offset: 2px;" 
+                    onmouseover="this.style.textDecoration='underline'" 
+                    onmouseout="this.style.textDecoration='underline'" 
+                    onclick="downloadFileExplanation()">
+                    Click here
+                </button>
+            </p>
         </div>
     </div>
 
@@ -1591,6 +1610,45 @@
             const overlay = document.getElementById('overlay');
             if (infoPanel) infoPanel.remove();
             if (overlay) overlay.remove();
+        }
+        // Download file explanation from resource folder
+        async function downloadFileExplanation() {
+            const fileName = 'ISO19011_explanation.zip';
+
+            try {
+                // Try relative path first (works with local server)
+                let filePath = "./resource/ISO19011_explaination.zip";
+                let response = await fetch(filePath);
+
+                // If that fails, try absolute path (for direct file access)
+                if (!response.ok) {
+                    filePath = "resource/ISO19011_explaination.zip";
+                    response = await fetch(filePath);
+                }
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = fileName;
+                link.style.display = 'none';
+
+                document.body.appendChild(link);
+                link.click();
+
+                // Clean up
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(link);
+
+            } catch (error) {
+                console.error('Download failed:', error);
+                alert('Failed to download the file. Please make sure you are running this through a local server (npm run dev) or the file exists in the resource folder.');
+            }
         }
 
         function getDetailedInformation(title) {
@@ -1800,7 +1858,7 @@
                     createPDFWithContent(content, filename);
                     document.body.removeChild(loadingMsg);
                 };
-                script.onerror = function() {
+                script.onerror = function () {
                     alert('Error loading PDF library. Please try again.');
                     document.body.removeChild(loadingMsg);
                 };
@@ -1826,14 +1884,14 @@
             // Title with better styling
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(24);
-            doc.text('ISO 19011 Research Template', pageWidth/2, y, { align: 'center' });
+            doc.text('ISO 19011 Research Template', pageWidth / 2, y, { align: 'center' });
             y += 40;
 
             // Extract and display subtitle
             const titleMatch = content.match(/^([A-Z\s]+TEMPLATE)/);
             if (titleMatch) {
                 doc.setFontSize(18);
-                doc.text(titleMatch[1], pageWidth/2, y, { align: 'center' });
+                doc.text(titleMatch[1], pageWidth / 2, y, { align: 'center' });
                 y += 30;
             }
 
@@ -1858,7 +1916,7 @@
 
             lines.forEach((line) => {
                 const trimmedLine = line.trim();
-                
+
                 if (trimmedLine === '') {
                     addPageIfNeeded();
                     y += 10; // smaller gap for blank lines
@@ -1890,7 +1948,7 @@
                     // Checkbox item - draw checkbox manually
                     const text = trimmedLine.substring(2);
                     const wrapped = doc.splitTextToSize(text, textWidth - 40);
-                    
+
                     // Draw checkbox square
                     doc.rect(margin + 5, y - 8, 12, 12);
                     doc.text(wrapped[0], margin + 25, y);
@@ -1907,7 +1965,7 @@
                     const colonIndex = trimmedLine.indexOf(':');
                     const label = trimmedLine.substring(0, colonIndex + 1);
                     const value = trimmedLine.substring(colonIndex + 1).trim();
-                    
+
                     if (value) {
                         doc.setFont('helvetica', 'bold');
                         doc.text(label, margin, y);
@@ -1929,7 +1987,7 @@
             });
 
             doc.save(filename);
-            
+
             // Track download analytics
             if (typeof gtag !== 'undefined') {
                 gtag('event', 'download', {
@@ -1937,7 +1995,7 @@
                     'event_label': filename
                 });
             }
-            
+
             // Show success message
             const successMsg = document.createElement('div');
             successMsg.style.cssText = `
@@ -1955,7 +2013,7 @@
             `;
             successMsg.textContent = `✅ ${filename} downloaded successfully!`;
             document.body.appendChild(successMsg);
-            
+
             // Remove success message after 3 seconds
             setTimeout(() => {
                 if (successMsg.parentNode) {
@@ -1963,7 +2021,7 @@
                 }
             }, 3000);
         }
-        
+
         // Add CSS animation for success message
         const style = document.createElement('style');
         style.textContent = `
